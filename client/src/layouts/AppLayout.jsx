@@ -16,8 +16,14 @@ export default function AppLayout() {
         <div className="sidebar__logo">LOGO</div>
         <nav className="sidebar__nav">
           {menu.map((m) => (
-            <NavLink key={m.to} to={m.to} end={m.end}
-              className={({ isActive }) => 'sidebar__link' + (isActive ? ' is-active' : '')}>
+            <NavLink
+              key={m.to}
+              to={m.to}
+              end={m.end}
+              className={({ isActive }) =>
+                'sidebar__link' + (isActive ? ' is-active' : '')
+              }
+            >
               {m.label}
             </NavLink>
           ))}
@@ -30,7 +36,7 @@ export default function AppLayout() {
 
       <div className="app__body">
         <header className="topbar">
-          <span className="topbar__user">ชื่อผู้ใช้</span>
+          <span className="topbar__user">{displayName()}</span>
         </header>
         <main className="app__content">
           <Outlet />
