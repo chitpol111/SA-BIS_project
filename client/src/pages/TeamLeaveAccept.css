@@ -1,0 +1,39 @@
+.la { max-width: 965px; margin: 0 auto; }
+.la__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.9rem; }
+.la__head h1 { margin: 0; flex: 1; font-size: 2rem; font-weight: 500; }
+.la__back { border: 0; background: none; font-size: 2rem; cursor: pointer; display: grid; }
+.la__search {
+  display: flex; align-items: center; gap: 0.5rem; width: 300px; height: 30px; padding: 0 0.6rem;
+  background: #f4f4f6; border: 1px solid #c9cbd1; border-radius: 6px; color: #777;
+}
+.la__search input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 0.8rem; }
+
+.la__tabs { display: flex; gap: 1.2rem; margin-bottom: 0.9rem; }
+.la__tabs button {
+  width: 152px; height: 30px; border: 1px solid #c9cbd1; border-radius: 6px;
+  background: #f4f4f6; color: #143f77; font: inherit; font-size: 0.85rem; cursor: pointer;
+}
+.la__tabs button.is-on { background: #143f77; color: #fff; border-color: #143f77; }
+
+.la__err { margin: 0 0 0.7rem; padding: 0.5rem 0.9rem; background: #fee2e2; color: #b91c1c; border-radius: 8px; font-size: 0.85rem; }
+
+.la__box { padding: 0.6rem 0.8rem 0.8rem; background: #fff; border: 1px solid #c9cbd1; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12); }
+.la__scroll { max-height: calc(100vh - 330px); min-height: 200px; overflow-y: auto; display: grid; gap: 0.35rem; align-content: start; padding-right: 6px; }
+.la__row {
+  display: grid; align-items: center; text-align: center; gap: 0.5rem; font-size: 0.78rem;
+  grid-template-columns: 50px 1.4fr 1.6fr 2fr 1.3fr 1.2fr 80px;
+}
+.la__row--head { padding: 0.2rem 0.75rem 0.35rem; margin-bottom: 0.3rem; border-bottom: 1px solid #aaa; margin-right: 6px; }
+.la__row--item { min-height: 33px; padding: 0 0.75rem; background: #fff; border: 1px solid #bbb; border-radius: 6px; }
+.la__pill { display: block; padding: 1px 10px; font-style: normal; background: #fff; border: 1px solid #aaa; border-radius: 6px; }
+.la__date {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; font-style: normal;
+  padding: 1px 9px; background: #dce8f5; border: 1px solid #9fb6d0; border-radius: 6px; font-size: 0.74rem; white-space: nowrap;
+}
+.la__empty { padding: 1rem; text-align: center; color: #666; }
+
+@media (max-width: 900px) {
+  .la__box { overflow-x: auto; }
+  .la__row { min-width: 820px; }
+  .la__search { width: 200px; }
+}

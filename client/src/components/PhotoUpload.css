@@ -1,0 +1,37 @@
+.photo { width: 100%; }
+.photo__box {
+  position: relative; width: 100%; height: 232px; border-radius: 8px; overflow: hidden;
+}
+.photo__box--empty {
+  display: grid; place-content: center; justify-items: center; gap: 0.35rem;
+  background: #fff; border: 2px dashed #9fb6d0; color: #5a7aa3;
+  font: inherit; cursor: pointer; text-align: center; transition: background 0.15s, border-color 0.15s;
+}
+.photo__box--empty svg { font-size: 2.6rem; }
+.photo__box--empty strong { font-size: 1rem; font-weight: 500; color: #143f77; }
+.photo__box--empty small { font-size: 0.75rem; color: #777; line-height: 1.4; }
+.photo__box--empty:hover, .photo__box--empty.is-drag { background: #eef3fa; border-color: #143f77; }
+.photo__box--empty:disabled { cursor: wait; opacity: 0.8; }
+
+.photo__box--filled img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo__actions {
+  position: absolute; inset: auto 0 0 0; display: flex; justify-content: center; gap: 0.5rem;
+  padding: 0.6rem; background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+  opacity: 0; transition: opacity 0.15s;
+}
+.photo__box--filled:hover .photo__actions,
+.photo__box--filled:focus-within .photo__actions { opacity: 1; }
+.photo__actions button {
+  display: inline-flex; align-items: center; gap: 0.35rem; height: 30px; padding: 0 0.8rem;
+  border: 0; border-radius: 6px; background: #fff; color: #143f77;
+  font: inherit; font-size: 0.8rem; cursor: pointer;
+}
+.photo__actions .is-danger { color: #b91c1c; }
+.photo__actions button:disabled { opacity: 0.6; cursor: wait; }
+.photo__error { margin: 0.4rem 0 0; font-size: 0.8rem; color: #b91c1c; }
+
+/* มือถือ/ทัช: ไม่มี hover จึงโชว์ปุ่มตลอด */
+@media (hover: none) { .photo__actions { opacity: 1; } }
+
+.spin { animation: photo-spin 1s linear infinite; }
+@keyframes photo-spin { to { transform: rotate(360deg); } }

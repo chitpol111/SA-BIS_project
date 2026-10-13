@@ -1,0 +1,50 @@
+.ta { max-width: 965px; margin: 0 auto; }
+.ta__head { display: flex; align-items: flex-end; gap: 1rem; margin-bottom: 1rem; }
+.ta__head h1 { margin: 0; flex: 1; font-size: 2rem; font-weight: 500; color: #1e1578; }
+.ta__back { border: 0; background: none; font-size: 2rem; cursor: pointer; display: grid; }
+.ta__backlink {
+  display: inline-flex; align-items: center; gap: 0.6rem; color: #1e1578; text-decoration: underline; margin-right: 3rem;
+}
+.ta__msg { padding: 1rem; text-align: center; color: #666; }
+
+.ta__grid {
+  display: grid; grid-template-columns: repeat(3, 238px); justify-content: space-around;
+  gap: 1.2rem 1.5rem; padding: 0 0.5rem;
+}
+.ta__add {
+  display: grid; place-content: center; justify-items: center; gap: 0.3rem;
+  width: 238px; height: 172px; margin-top: 18px; background: #fff;
+  border: 1.5px dashed #333; border-radius: 14px; font: inherit; font-size: 0.8rem; cursor: pointer;
+}
+.ta__add svg { font-size: 1.6rem; }
+.ta__add:hover { background: #f1f4fa; border-color: #143f77; color: #143f77; }
+
+/* ป๊อปอัปเพิ่มทีม */
+.tm { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: rgba(0, 0, 0, 0.25); }
+.tm__box {
+  display: grid; gap: 1rem; width: min(92vw, 380px); padding: 1.3rem 1.5rem 1.4rem;
+  background: #fff; border-radius: 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+.tm__box h3 { margin: 0; text-align: center; font-weight: 500; }
+.tm__box label { display: grid; gap: 0.35rem; font-size: 0.9rem; }
+.tm__box input {
+  height: 38px; padding: 0 0.8rem; border: 1px solid #bbb; border-radius: 6px; font: inherit;
+}
+.tm__box input:focus { outline: 2px solid #2b9cf2; }
+.tm__colors { display: grid; gap: 0.4rem; font-size: 0.9rem; }
+.tm__colors div { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tm__colors button {
+  width: 34px; height: 28px; border: 2px solid transparent; border-radius: 6px; cursor: pointer;
+}
+.tm__colors button.is-on { border-color: #111; }
+.tm__error { margin: 0; padding: 0.5rem 0.8rem; background: #fee2e2; color: #b91c1c; border-radius: 8px; font-size: 0.85rem; }
+.tm__btns { display: flex; justify-content: center; gap: 1rem; }
+.tm__btns button {
+  min-width: 120px; height: 38px; border: 0; border-radius: 6px; background: #d9d9d9; font: inherit; cursor: pointer;
+}
+.tm__btns .tm__ok { background: #143f77; color: #fff; }
+.tm__btns button:disabled { opacity: 0.6; cursor: wait; }
+
+@media (max-width: 900px) {
+  .ta__grid { grid-template-columns: repeat(auto-fit, 238px); }
+}

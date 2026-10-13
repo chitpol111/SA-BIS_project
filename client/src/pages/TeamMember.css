@@ -1,0 +1,112 @@
+.tmb { max-width: 985px; margin: 0 auto; }
+.tmb__msg { padding: 2rem; text-align: center; color: #666; }
+.tmb__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.tmb__head h1 { margin: 0; font-size: 2rem; font-weight: 500; color: #1e1578; }
+.tmb__head button { border: 0; background: none; font-size: 2rem; cursor: pointer; display: grid; }
+
+/* แถบเลือกสมาชิก */
+.tmb__tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding: 4px 4px 10px; margin-bottom: 0.4rem; }
+.tmb__tabs button {
+  flex: none; display: flex; align-items: center; gap: 0.9rem; width: 248px; height: 56px; padding: 0 1rem;
+  background: #f4f4f6; border: 1px solid #bbb; border-radius: 12px; font: inherit; font-size: 0.95rem;
+  text-align: left; cursor: pointer;
+}
+.tmb__tabs button.is-on { border: 2px solid #555; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); }
+.tmb__ava {
+  flex: none; display: grid; place-items: center; width: 38px; height: 38px;
+  background: #777; color: #ddd; border-radius: 50%; font-size: 1.2rem;
+}
+
+.tmb__grid { display: grid; grid-template-columns: 1fr 258px; gap: 0.9rem; align-items: start; }
+.tmb__main { display: grid; gap: 0.7rem; min-width: 0; }
+.tmb__side { display: grid; gap: 0.7rem; }
+
+.tmb__stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
+.tmb__stat {
+  display: grid; justify-items: center; align-content: center; gap: 0.05rem; height: 92px;
+  background: #f4f4f6; border: 1px solid #bbb; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+.tmb__stat span { font-size: 0.8rem; }
+.tmb__stat strong { font-size: 1.9rem; line-height: 1.2; }
+.tmb__stat small { font-size: 0.7rem; color: #666; }
+
+.tmb__panel, .tmb__card {
+  background: #f4f4f6; border: 1px solid #c9cbd1; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+.tmb__panel { padding: 0.7rem 0.9rem 0.9rem; }
+.tmb__panel h2 { margin: 0 0 0.5rem; font-size: 1.1rem; font-weight: 500; }
+
+.tmb__chips { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+.tmb__chips button {
+  height: 22px; padding: 0 0.8rem; background: #fff; border: 1px solid #999; border-radius: 6px;
+  font: inherit; font-size: 0.7rem; cursor: pointer;
+}
+.tmb__chips button.is-on { background: #143f77; color: #fff; border-color: #143f77; }
+
+.tmb__scroll { max-height: 172px; overflow-y: auto; display: grid; gap: 0.35rem; align-content: start; padding-right: 4px; }
+.tmb__row { display: grid; align-items: center; text-align: center; gap: 0.4rem; font-size: 0.72rem; }
+.tmb__row--jobs { grid-template-columns: 42px 1.3fr 0.9fr 2fr 1.2fr 22px; }
+.tmb__row--hist { grid-template-columns: 1fr 1.4fr 1.3fr 1.6fr; }
+.tmb__row--head { position: sticky; top: 0; z-index: 1; padding: 0.2rem 0.5rem; background: #f4f4f6; border-bottom: 1px solid #999; }
+.tmb__row--item { min-height: 30px; padding: 0 0.5rem; background: #fff; border: 1px solid #bbb; border-radius: 6px; }
+.tmb__empty { margin: 0.6rem 0; text-align: center; font-size: 0.8rem; color: #777; }
+
+.tmb__tag, .tmb__date {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; font-style: normal;
+  padding: 1px 9px; border-radius: 999px; font-size: 0.7rem; white-space: nowrap;
+}
+.tmb__date { background: #dce8f5; border: 1px solid #9fb6d0; border-radius: 6px; }
+
+/* โปรไฟล์ */
+.tmb__profile { position: relative; display: grid; justify-items: center; padding: 0.7rem 0.9rem 1rem; }
+.tmb__onduty { display: flex; align-items: center; gap: 0.35rem; font-size: 0.6rem; color: #444; }
+.tmb__onduty i { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; }
+.tmb__kebab { position: absolute; top: 8px; right: 8px; border: 0; background: none; cursor: pointer; display: grid; }
+.tmb__photo {
+  display: grid; place-items: center; width: 118px; height: 118px; margin: 0.6rem 0 0.8rem;
+  background: #d9d9d9; color: #777; border-radius: 50%; font-size: 4.2rem; overflow: hidden;
+}
+.tmb__profile h3 { margin: 0 0 0.4rem; font-size: 1.15rem; font-weight: 600; text-align: center; }
+.tmb__pos {
+  min-width: 140px; padding: 2px 12px; text-align: center; background: #fff;
+  border: 1px solid #999; border-radius: 6px; font-size: 0.75rem;
+}
+.tmb__profile p { margin: 0.4rem 0 0.8rem; font-size: 0.8rem; color: #777; }
+.tmb__contacts { display: flex; gap: 1rem; font-size: 1.15rem; }
+.tmb__contacts a { display: grid; }
+.tmb__contacts a.is-off { opacity: 0.35; pointer-events: none; }
+
+/* ภาพรวม */
+.tmb__overview { display: grid; gap: 0.5rem; padding: 0.7rem 0.8rem 0.8rem; }
+.tmb__pill {
+  display: block; padding: 2px 10px; text-align: center; background: #fff;
+  border: 1px solid #999; border-radius: 6px; font-size: 0.8rem;
+}
+.tmb__pill--sm { display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; font-size: 0.62rem; }
+.tmb__info { display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.5rem; }
+.tmb__info div {
+  display: grid; justify-items: center; gap: 0; padding: 0.3rem 0.4rem; position: relative;
+  background: #fff; border: 1px solid #999; border-radius: 6px; font-size: 0.65rem;
+}
+.tmb__info svg { position: absolute; left: 6px; top: 6px; }
+.tmb__info small { font-size: 0.6rem; }
+.tmb__info b { font-weight: 400; font-size: 0.7rem; }
+.tmb__load small { font-size: 0.65rem; }
+.tmb__loadbody { display: flex; align-items: center; gap: 0.6rem; }
+.tmb__donut { position: relative; width: 84px; height: 84px; flex: none; }
+.tmb__donut span {
+  position: absolute; inset: 0; display: grid; place-items: center; font-size: 0.7rem; font-weight: 700;
+}
+.tmb__cap { display: grid; gap: 0.15rem; text-align: center; font-size: 0.65rem; }
+.tmb__cap b { font-weight: 400; }
+.tmb__cap small { color: #777; }
+.tmb__ready { display: flex; justify-content: space-between; gap: 0.4rem; }
+.tmb__pill.is-free { background: #c6f3d4; border-color: #86d9a1; color: #166534; }
+.tmb__pill.is-busy { background: #f9d0d0; border-color: #e79c9c; color: #b91c1c; }
+
+@media (max-width: 1000px) {
+  .tmb__grid { grid-template-columns: 1fr; }
+  .tmb__stats { grid-template-columns: repeat(2, 1fr); }
+  .tmb__scroll { overflow-x: auto; }
+  .tmb__row { min-width: 560px; }
+}

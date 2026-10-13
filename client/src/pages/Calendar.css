@@ -1,0 +1,120 @@
+.cal { max-width: 985px; margin: 0 auto; }
+.cal__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.cal__head h1 { margin: 0; flex: 1; font-size: 2rem; font-weight: 500; }
+.cal__back { border: 0; background: none; font-size: 2rem; cursor: pointer; display: grid; }
+.cal__search {
+  display: flex; align-items: center; gap: 0.5rem; width: 250px; height: 28px; padding: 0 0.6rem;
+  background: #f4f4f6; border: 1px solid #c9cbd1; border-radius: 6px; color: #777;
+}
+.cal__search input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 0.8rem; }
+.cal__err { padding: 0.5rem 0.9rem; background: #fee2e2; color: #b91c1c; border-radius: 8px; font-size: 0.85rem; }
+
+.cal__grid { display: grid; grid-template-columns: 290px 1fr; gap: 1.6rem; align-items: start; }
+.cal__left { display: grid; gap: 1.4rem; }
+
+/* ปฏิทินเล็ก */
+.mini { border-radius: 28px 28px 22px 22px; background: #8bbcf8; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); overflow: hidden; }
+.mini header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.3rem 1.3rem; font-size: 0.85rem; }
+.mini header span { display: flex; gap: 0.6rem; }
+.mini header button { display: grid; border: 0; background: none; font-size: 1.2rem; cursor: pointer; color: #111; }
+.mini__body {
+  display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px; justify-items: center;
+  margin-top: -0.6rem; padding: 0.7rem 0.6rem 0.9rem; background: #fff; border-radius: 28px 28px 0 0;
+}
+.mini__body b { font-size: 0.55rem; font-weight: 500; margin-bottom: 4px; }
+.mini__day {
+  position: relative; display: grid; place-items: center; width: 24px; height: 24px; padding: 0;
+  border: 0; border-radius: 50%; background: none; font: inherit; font-size: 0.65rem; cursor: pointer;
+}
+.mini__day:hover { background: #eef3fa; }
+.mini__day.is-today { outline: 1px solid #143f77; }
+.mini__day.is-sel { background: #143f77; color: #fff; font-weight: 700; }
+.mini__day i { position: absolute; bottom: 1px; width: 3px; height: 3px; border-radius: 50%; background: #ef4444; }
+
+/* My Calendar */
+.todo { padding: 1.1rem 1.3rem 0.8rem; background: #f3f3f3; border-radius: 28px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); }
+.todo header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.4rem; border-bottom: 1px solid #333; }
+.todo h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+.todo header button { display: inline-flex; align-items: center; gap: 0.3rem; border: 0; background: none; color: #999; font: inherit; font-weight: 600; cursor: pointer; }
+.todo ul { list-style: none; margin: 0.9rem 0 0.5rem; padding: 0 0.3rem; display: grid; gap: 0.85rem; }
+.todo li { display: flex; align-items: center; gap: 0.8rem; font-size: 0.75rem; }
+.todo li span { flex: 1; }
+.todo li form { flex: 1; }
+.todo li input { width: 100%; height: 28px; padding: 0 0.6rem; border: 1px solid #bbb; border-radius: 6px; font: inherit; font-size: 0.75rem; }
+.todo__box {
+  flex: none; display: grid; place-items: center; width: 20px; height: 20px; padding: 0;
+  border: 2px solid #111; border-radius: 50%; background: #fff; color: #fff; font-size: 0.75rem; cursor: pointer;
+}
+.is-done .todo__box { background: #143f77; border-color: #143f77; }
+.todo__x { border: 0; background: none; color: #aaa; cursor: pointer; display: grid; opacity: 0; }
+.todo li:hover .todo__x { opacity: 1; }
+.todo__x:hover { color: #ef2b3a; }
+.todo__empty { color: #888; justify-content: center; }
+.todo__more {
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%;
+  padding-top: 0.6rem; border: 0; border-top: 1px solid #333; background: none; color: #aaa; font: inherit; font-weight: 600; cursor: pointer;
+}
+
+/* สัปดาห์ */
+.week { border-radius: 36px; background: #c28080; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3); overflow: hidden; }
+.week header { display: flex; justify-content: space-between; align-items: center; padding: 1.3rem 1.7rem 2.2rem; color: #fff; }
+.week h2 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+.week__nav { display: flex; align-items: center; gap: 0.8rem; }
+.week__nav button { display: grid; border: 0; background: none; color: #fff; font-size: 1.4rem; cursor: pointer; }
+.week__nav .week__today { font: inherit; font-size: 1.1rem; font-weight: 700; }
+.week__body { min-height: 470px; margin-top: -1.2rem; padding: 1.2rem 1.4rem 1.5rem; background: #f3f3f3; border-radius: 36px 36px 0 0; }
+.week__tools { display: flex; justify-content: flex-end; gap: 0.6rem; margin-bottom: 0.8rem; }
+.week__tools button {
+  display: inline-flex; align-items: center; gap: 0.35rem; height: 28px; padding: 0 0.8rem;
+  background: #fff; border: 1px solid #bbb; border-radius: 6px; font: inherit; font-size: 0.75rem; cursor: pointer;
+}
+.week__tools button:hover { border-color: #2b9cf2; }
+
+.week__days { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 1.1rem; }
+.week__days button { display: grid; justify-items: center; padding: 4px 0; border: 0; border-radius: 10px; background: none; font: inherit; cursor: pointer; }
+.week__days strong { font-size: 1.2rem; line-height: 1.1; }
+.week__days small { font-size: 0.5rem; color: #666; }
+.week__days button.is-sel { background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
+
+.week__bars { display: grid; grid-template-columns: repeat(7, 1fr); grid-auto-rows: 44px; gap: 14px 0; }
+.bar {
+  display: grid; align-content: center; padding: 0 1.2rem; border: 0; border-radius: 999px; text-align: left;
+  font: inherit; cursor: pointer; box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3); overflow: hidden; min-width: 0;
+}
+.bar b { font-size: 0.8rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar small { font-size: 0.6rem; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar:hover { filter: brightness(1.08); }
+.week__empty { grid-column: 1 / -1; padding: 2rem 0; text-align: center; color: #888; font-size: 0.85rem; }
+
+/* ป๊อปอัป */
+.cm { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: rgba(0, 0, 0, 0.25); }
+.cm__box {
+  display: grid; gap: 0.7rem; width: min(92vw, 380px); padding: 1.3rem 1.5rem 1.4rem;
+  background: #fff; border-radius: 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+.cm__box h3 { margin: 0; font-weight: 500; font-size: 1.2rem; }
+.cm__box p { margin: 0; font-size: 0.85rem; color: #444; }
+.cm__note { padding: 0.5rem 0.7rem; background: #f4f4f6; border-radius: 8px; }
+.cm__chip { justify-self: start; padding: 1px 12px; border-radius: 999px; font-size: 0.7rem; }
+.cm__google { color: #1a73e8; font-size: 0.85rem; text-decoration: underline; }
+.cm__form label { display: grid; gap: 0.3rem; font-size: 0.85rem; }
+.cm__form input { height: 36px; padding: 0 0.7rem; border: 1px solid #bbb; border-radius: 6px; font: inherit; }
+.cm__form input:focus { outline: 2px solid #2b9cf2; }
+.cm__dates { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+.cm__colors { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.cm__colors button { width: 26px; height: 26px; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #bbb; cursor: pointer; }
+.cm__colors button.is-on { box-shadow: 0 0 0 2px #111; }
+.cm__error { padding: 0.5rem 0.8rem !important; background: #fee2e2; color: #b91c1c !important; border-radius: 8px; }
+.cm__btns { display: flex; justify-content: center; gap: 0.9rem; margin-top: 0.3rem; }
+.cm__btns button { min-width: 120px; height: 38px; border: 0; border-radius: 6px; background: #d9d9d9; font: inherit; cursor: pointer; }
+.cm__btns .cm__ok { background: #143f77; color: #fff; }
+.cm__btns .cm__del { background: #ef4444; color: #fff; }
+.cm__btns button:disabled { opacity: 0.6; cursor: wait; }
+
+@media (max-width: 960px) {
+  .cal__grid { grid-template-columns: 1fr; }
+  .cal__search { width: 180px; }
+  .week__bars { min-width: 560px; }
+  .week__body { overflow-x: auto; }
+  .week__days { min-width: 560px; }
+}

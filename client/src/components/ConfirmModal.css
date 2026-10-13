@@ -1,0 +1,18 @@
+.modal {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center;
+  background: rgba(0, 0, 0, 0.25);
+}
+.modal__box {
+  width: min(92vw, 350px); padding: 1.4rem 1.5rem 1.5rem; text-align: center;
+  background: #fff; border-radius: 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+.modal__box p { margin: 0 0 1.2rem; font-size: 1rem; font-weight: 500; }
+.modal__btns { display: flex; justify-content: center; gap: 1.2rem; }
+.modal__btns button {
+  min-width: 128px; height: 38px; border: 0; border-radius: 6px;
+  font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.modal__cancel { background: #d9d9d9; color: #222; }
+.modal__ok { background: #143f77; color: #fff; }
+.modal__btns button:disabled { opacity: 0.6; cursor: wait; }
