@@ -1,0 +1,27 @@
+{
+  "name": "manpower-ma",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix client",
+    "start": "node server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phansiriphat-wi/manpower-ma.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/phansiriphat-wi/manpower-ma/issues"
+  },
+  "homepage": "https://github.com/phansiriphat-wi/manpower-ma#readme",
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

@@ -1,0 +1,13 @@
+.hero { padding: var(--space-5) 0; background: var(--color-surface); }
+.hero__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-4);
+}
+.hero h1 { font-size: var(--fs-h1); line-height: 1.15; margin: 0 0 var(--space-2); }
+.hero p { color: var(--color-muted); margin: 0 0 var(--space-3); }
+
+@media (max-width: 768px) {
+  .hero__inner { grid-template-columns: 1fr; }
+}

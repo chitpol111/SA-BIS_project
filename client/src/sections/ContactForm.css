@@ -1,0 +1,17 @@
+.contact { padding: var(--space-5) 0; }
+.contact__inner { max-width: 640px; }
+.contact__form { display: grid; gap: var(--space-2); }
+.contact__form input,
+.contact__form textarea {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d6d9e0;
+  border-radius: var(--radius);
+  font: inherit;
+}
+.contact__form input:focus,
+.contact__form textarea:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: transparent;
+}
+.contact__ok { color: #15803d; }
+.contact__err { color: #b91c1c; }

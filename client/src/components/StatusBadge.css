@@ -1,0 +1,7 @@
+.badge {
+  display: inline-block; min-width: 96px; padding: 2px 12px; text-align: center;
+  border-radius: 999px; font-size: 0.7rem; border: 1px solid transparent;
+}
+.badge--pending { background: #fdf0c4; color: #e08a00; border-color: #f4d675; }
+.badge--progress { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+.badge--done { background: #d1fae5; color: #047857; border-color: #6ee7b7; }

@@ -1,0 +1,15 @@
+.header {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--color-bg);
+  border-bottom: 1px solid #eee;
+}
+.header__inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 72px;
+}
+.header__logo { font-weight: 700; font-size: 1.25rem; }
+.header__nav { display: flex; align-items: center; gap: var(--space-3); }
+
+@media (max-width: 640px) {
+  .header__nav a:not(.btn) { display: none; }
+}

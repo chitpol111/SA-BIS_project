@@ -1,0 +1,10 @@
+.stat {
+  display: grid; place-items: center; gap: 0.2rem;
+  height: 128px; padding: 0.5rem;
+  background: #f4f4f6; border: 1px solid #c9cbd1; border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  font: inherit; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.stat:hover, .stat.is-active { border: 2px solid #2b9cf2; }
+.stat__value { font-size: 3rem; font-weight: 700; line-height: 1; }
+.stat__label { font-size: 1.35rem; color: #111; }
