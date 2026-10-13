@@ -2,11 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import JobCard from '../../components/JobCard'
 import StatCard from '../../components/StatCard'
 import { authHeader } from '../../api'
-import { getUser } from '../../auth'
+import { displayName } from '../../auth'
 import './StaffHome.css'
 
 export default function StaffHome() {
-  const user = getUser()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [tab, setTab] = useState('all') // all | done
@@ -37,11 +36,11 @@ export default function StaffHome() {
 
   const { jobs, stats } = data
   const rows = tab === 'done' ? jobs.filter((j) => j.progress === 'done') : jobs
-  const displayName = (user?.name || '').replace(/^(นางสาว|นาย|นาง)/, '')
+  const name = displayName()
 
   return (
     <div className="sh">
-      <h1>สวัสดี คุณ {displayName}</h1>
+      <h1>สวัสดี คุณ {name}</h1>
 
       <div className="sh__stats">
         <StatCard value={stats.total} label="งานทั้งหมด" color="#1a4f9c" />

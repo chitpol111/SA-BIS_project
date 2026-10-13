@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { displayName } from '../auth'
 import './AppLayout.css'
 
 const menu = [

@@ -6,3 +6,5 @@ export function getUser() {
   }
 }
 export const isDirector = () => getUser()?.role === 'director'
+
+export const displayName = () => getUser()?.name || 'ผู้ใช้'

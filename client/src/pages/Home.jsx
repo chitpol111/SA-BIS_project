@@ -7,6 +7,7 @@ import {
 import { FiCalendar, FiUser } from 'react-icons/fi'
 import StatCard from '../components/StatCard'
 import StatusBadge from '../components/StatusBadge'
+import { displayName } from '../auth'
 import './Home.css'
 
 const BAR_COLORS = ['#143f77', '#d4af37', '#8b5cf6', '#f97316', '#0ea5e9', '#10b981', '#64748b']
@@ -35,7 +36,7 @@ export default function Home() {
 
   return (
     <div className="home">
-      <h1 className="home__hello">สวัสดี คุณ {user?.name || 'ผู้ใช้'}</h1>
+      <h1 className="home__hello">สวัสดี คุณ {displayName()}</h1>
 
       <div className="home__stats">
         <StatCard value={stats.total} label="งานทั้งหมด" color="#1a4f9c" />

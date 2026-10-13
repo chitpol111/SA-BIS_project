@@ -29,3 +29,18 @@
   .app { grid-template-columns: 1fr; }
   .sidebar { display: none; }
 }
+/* sidebar-sticky:start */
+@media (min-width: 861px) {
+  .sidebar { visibility: hidden; }          /* ช่องว่างใน grid เว้นที่ไว้ 150px */
+  .sidebar > * { visibility: visible; }
+  .sidebar {
+    position: relative;
+  }
+  .sidebar > .sidebar__title,
+  .sidebar > .sidebar__nav,
+  .sidebar > .sidebar__bottom { position: fixed; left: 0; width: 150px; }
+  .sidebar > .sidebar__title { top: 100px; }
+  .sidebar > .sidebar__nav { top: 130px; }
+  .sidebar > .sidebar__bottom { bottom: 1rem; }
+}
+/* sidebar-sticky:end */
