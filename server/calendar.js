@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { requireAuth } from './auth.js'
 import { works, staff } from './work.js'
+import { leaves } from './leave.js'
 
 const router = Router()
 const HEX = /^#[0-9a-fA-F]{6}$/
@@ -11,31 +12,48 @@ let eventId = 1
 let todoId = 6
 
 const customEvents = [
-  { id: eventId++, title: 'ประชุมประจำเดือน', start: '2026-10-14', end: '2026-10-14', color: '#0b98e0', note: 'ห้องประชุมกองช่าง' },
+  { id: eventId++, owner: 1, title: 'ประชุมประจำเดือน', start: '2026-10-14', end: '2026-10-14', color: '#0b98e0', note: 'ห้องประชุมกองช่าง' },
 ]
 
 const todos = [
-  { id: 1, text: 'เซ็นเอกสารอนุมัติการลา', done: true },
-  { id: 2, text: 'อนุมัติงบประมาณ', done: false },
-  { id: 3, text: 'ติดตามสถานะงาน', done: false },
-  { id: 4, text: 'ตรวจสอบอัตรากำลังเพื่อขอรับสมัครคนเพิ่ม', done: false },
-  { id: 5, text: 'ติดตามผลการดำเนินงานที่ล่าช้า', done: true },
-  { id: 6, text: 'มอบหมายงานใหม่', done: true },
+  { id: 1, owner: 1, text: 'เซ็นเอกสารอนุมัติการลา', done: true },
+  { id: 2, owner: 1, text: 'อนุมัติงบประมาณ', done: false },
+  { id: 3, owner: 1, text: 'ติดตามสถานะงาน', done: false },
+  { id: 4, owner: 1, text: 'ตรวจสอบอัตรากำลังเพื่อขอรับสมัครคนเพิ่ม', done: false },
+  { id: 5, owner: 1, text: 'ติดตามผลการดำเนินงานที่ล่าช้า', done: true },
+  { id: 6, owner: 1, text: 'มอบหมายงานใหม่', done: true },
 ]
 
-function workEvents() {
-  return works.map((w) => {
+function visibleWorks(u) {
+  if (u.role === 'director') return works
+  const id = u.memberId
+  if (!id) return []
+  const covered = new Set()
+  for (const l of leaves) {
+    if (l.status !== 'approved' || l.substituteId !== id) continue
+    for (const w of works) {
+      if (w.officers.includes(l.memberId) && w.progress !== 'done' && w.start <= l.end && l.start <= w.end) covered.add(w.id)
+    }
+  }
+  return works.filter((w) => w.officers.includes(id) || covered.has(w.id))
+}
+
+function workEvents(u) {
+  return visibleWorks(u).map((w) => {
     const names = (w.officers ?? []).map((id) => staff.find((s) => s.id === id)?.name).filter(Boolean)
     return {
       id: w.id, kind: 'work', title: w.title, start: w.start, end: w.end,
       color: TYPE_COLOR[w.type] || '#64748b',
-      subtitle: names.length ? names.join(', ') : 'ยังไม่มอบหมาย',
+      subtitle: u.role === 'director' ? (names.length ? names.join(', ') : 'ยังไม่มอบหมาย') : (w.address || ''),
     }
   })
 }
 
-router.get('/events', requireAuth, (_req, res) =>
-  res.json([...workEvents(), ...customEvents.map((e) => ({ ...e, kind: 'custom' }))])
+const mineEv = (u) => customEvents.filter((e) => e.owner === u.id)
+const mineTodo = (u) => todos.filter((t) => t.owner === u.id)
+
+router.get('/events', requireAuth, (req, res) =>
+  res.json([...workEvents(req.user), ...mineEv(req.user).map((e) => ({ ...e, kind: 'custom' }))])
 )
 
 router.post('/events', requireAuth, (req, res) => {
@@ -47,7 +65,7 @@ router.post('/events', requireAuth, (req, res) => {
   }
   if (!HEX.test(b.color)) return res.status(400).json({ error: 'สีไม่ถูกต้อง' })
   const ev = {
-    id: eventId++, title, start: b.start, end: b.end, color: b.color,
+    id: eventId++, owner: req.user.id, title, start: b.start, end: b.end, color: b.color,
     note: String(b.note ?? '').slice(0, 500),
   }
   customEvents.push(ev)
@@ -55,32 +73,34 @@ router.post('/events', requireAuth, (req, res) => {
 })
 
 router.delete('/events/:id', requireAuth, (req, res) => {
-  const i = customEvents.findIndex((e) => e.id === Number(req.params.id))
+  const i = customEvents.findIndex((e) => e.id === Number(req.params.id) && e.owner === req.user.id)
   if (i === -1) return res.status(404).json({ error: 'ไม่พบกิจกรรม' })
   customEvents.splice(i, 1)
   res.json({ ok: true })
 })
 
 // ---------- รายการสิ่งที่ต้องทำ ----------
-router.get('/todos', requireAuth, (_req, res) => res.json(todos))
+// ครั้งแรกที่ผู้ใช้เปิด: สร้างรายการเริ่มต้นให้ ผอ. (id 1) ส่วนคนอื่นเริ่มว่าง
+router.get('/todos', requireAuth, (req, res) => res.json(mineTodo(req.user).map(({ owner, ...t }) => t)))
 
 router.post('/todos', requireAuth, (req, res) => {
   const text = String(req.body?.text ?? '').trim().slice(0, 150)
   if (!text) return res.status(400).json({ error: 'กรุณากรอกข้อความ' })
-  const t = { id: ++todoId, text, done: false }
+  const t = { id: ++todoId, owner: req.user.id, text, done: false }
   todos.push(t)
-  res.status(201).json(t)
+  const { owner, ...out } = t
+  res.status(201).json(out)
 })
 
 router.patch('/todos/:id', requireAuth, (req, res) => {
-  const t = todos.find((x) => x.id === Number(req.params.id))
+  const t = todos.find((x) => x.id === Number(req.params.id) && x.owner === req.user.id)
   if (!t) return res.status(404).json({ error: 'ไม่พบรายการ' })
   t.done = Boolean(req.body?.done)
-  res.json(t)
+  res.json({ id: t.id, text: t.text, done: t.done })
 })
 
 router.delete('/todos/:id', requireAuth, (req, res) => {
-  const i = todos.findIndex((x) => x.id === Number(req.params.id))
+  const i = todos.findIndex((x) => x.id === Number(req.params.id) && x.owner === req.user.id)
   if (i === -1) return res.status(404).json({ error: 'ไม่พบรายการ' })
   todos.splice(i, 1)
   res.json({ ok: true })

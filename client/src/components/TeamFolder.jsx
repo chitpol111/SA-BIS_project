@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { FiMoreVertical, FiUser } from 'react-icons/fi'
 import './TeamFolder.css'
 
-export default function TeamFolder({ team }) {
+export default function TeamFolder({ team, clickable = true }) {
   const navigate = useNavigate()
   const shown = Math.min(3, team.memberCount)
   const rest = team.memberCount - shown
@@ -11,9 +11,10 @@ export default function TeamFolder({ team }) {
     <div
       className="folder"
       style={{ '--front': team.front, '--back': team.back }}
-      role="link" tabIndex={0}
-      onClick={() => navigate(`/team/${team.id}`)}
-      onKeyDown={(e) => e.key === 'Enter' && navigate(`/team/${team.id}`)}
+      role={clickable ? 'link' : undefined} tabIndex={clickable ? 0 : undefined}
+      style={{ '--front': team.front, '--back': team.back, cursor: clickable ? 'pointer' : 'default' }}
+      onClick={clickable ? () => navigate(`/team/${team.id}`) : undefined}
+      onKeyDown={clickable ? (e) => e.key === 'Enter' && navigate(`/team/${team.id}`) : undefined}
     >
       <span className="folder__back" />
       <div className="folder__front">

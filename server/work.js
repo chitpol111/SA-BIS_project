@@ -4,7 +4,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import crypto from 'node:crypto'
 import { fileURLToPath } from 'node:url'
-import { requireAuth } from './auth.js'
+import { requireAuth, requireRole } from './auth.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export const UPLOAD_DIR = path.join(__dirname, 'uploads')
@@ -73,7 +73,7 @@ router.get('/:id', requireAuth, (req, res) => {
   res.json(w)
 })
 
-router.post('/:id/photo', requireAuth, (req, res) => {
+router.post('/:id/photo', ...requireRole('director'), (req, res) => {
   const w = works.find((x) => x.id === Number(req.params.id))
   if (!w) return res.status(404).json({ error: 'ไม่พบงาน' })
 
@@ -89,7 +89,7 @@ router.post('/:id/photo', requireAuth, (req, res) => {
   })
 })
 
-router.delete('/:id/photo', requireAuth, (req, res) => {
+router.delete('/:id/photo', ...requireRole('director'), (req, res) => {
   const w = works.find((x) => x.id === Number(req.params.id))
   if (!w) return res.status(404).json({ error: 'ไม่พบงาน' })
   removePhotoFile(w.photo)
@@ -97,7 +97,7 @@ router.delete('/:id/photo', requireAuth, (req, res) => {
   res.json({ photo: '' })
 })
 
-router.put('/:id', requireAuth, (req, res) => {
+router.put('/:id', ...requireRole('director'), (req, res) => {
   const w = works.find((x) => x.id === Number(req.params.id))
   if (!w) return res.status(404).json({ error: 'ไม่พบงาน' })
 
@@ -130,3 +130,35 @@ router.put('/:id', requireAuth, (req, res) => {
 })
 
 export default router
+
+// ---- ข้อมูลตัวอย่างสำหรับหน้าเจ้าหน้าที่ ----
+const ADDR = 'หมู่ 3 ต.ตลาด อ.เมืองพนมสารคาม จ.ฉะเชิงเทรา'
+for (const w of works) {
+  w.progress = 'notstarted'
+  w.address ||= ADDR
+}
+const SEED = { 2: 'progress', 4: 'done', 6: 'progress', 7: 'notstarted', 8: 'progress', 9: 'done' }
+for (const [id, progress] of Object.entries(SEED)) {
+  const w = works.find((x) => x.id === Number(id))
+  if (!w) continue
+  if (!w.officers.includes(3)) w.officers.push(3)
+  w.progress = progress
+  w.status = 'มอบหมายแล้ว'
+}
+for (const id of [7, 8]) {
+  const w = works.find((x) => x.id === id)
+  w.start = '2026-10-12'
+  w.end = '2026-10-16'
+}
+works.find((x) => x.id === 8).priority = 'ปกติ'
+
+for (const w of works) {
+  w.staffNote ??= ''
+  w.updates ??= []
+}
+for (const id of [12, 13]) {
+  const w = works.find((x) => x.id === id)
+  if (!w.officers.includes(1)) w.officers.push(1)
+  w.status = 'มอบหมายแล้ว'
+}
+works.find((x) => x.id === 13).priority = 'ปกติ'

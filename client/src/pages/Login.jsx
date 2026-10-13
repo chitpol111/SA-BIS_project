@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaUser, FaLock, FaKey, FaUserCircle, FaCog, FaArrowRight } from 'react-icons/fa'
+import { FaUser, FaLock, FaUserCircle, FaCog, FaArrowRight } from 'react-icons/fa'
 import './Login.css'
 
 export default function Login() {
@@ -95,18 +95,6 @@ export default function Login() {
           <button className="login__submit" disabled={loading}>
             {loading ? 'กำลังเข้าสู่ระบบ...' : <>เข้าสู่ระบบ <FaArrowRight /></>}
           </button>
-
-          <div className="login__demo">
-            <small>Demo Account</small>
-            <div className="login__demo-btns">
-              <button type="button" onClick={() => setEmail('admin@demo.com')}>
-                <FaUserCircle className="is-yellow" /> admin
-              </button>
-              <button type="button" onClick={() => setPassword('password123')}>
-                <FaKey className="is-yellow" /> password
-              </button>
-            </div>
-          </div>
         </form>
       </section>
     </div>

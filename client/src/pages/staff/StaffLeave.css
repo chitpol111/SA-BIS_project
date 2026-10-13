@@ -1,0 +1,62 @@
+.lf { max-width: 760px; margin: 0 auto; }
+.lf__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.lf__head h1 { margin: 0; flex: 1; font-size: 1.9rem; font-weight: 600; color: #1e1578; }
+.lf__head button { border: 0; background: none; font-size: 1.8rem; cursor: pointer; display: grid; }
+.lf__head .lf__home { width: 26px; height: 26px; font-size: 1rem; background: #143f77; color: #fff; border-radius: 6px; place-items: center; }
+
+.lf__card { display: grid; gap: 0.9rem; padding: 1.3rem 1.5rem 1.2rem; background: #fff; border: 1px solid #ccc; border-radius: 8px; }
+.lf__card h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.lf__sub { margin: -0.7rem 0 0; font-size: 0.7rem; color: #666; }
+.lf__card label { display: grid; gap: 0.3rem; font-size: 0.8rem; }
+.lf__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.lf__select, .lf__input { position: relative; display: flex; align-items: center; height: 36px; background: #fff; border: 1px solid #ccc; border-radius: 6px; }
+.lf__select--half, .lf__input--half { width: 60%; }
+.lf__select select { appearance: none; width: 100%; height: 100%; padding: 0 2rem 0 0.8rem; border: 0; background: transparent; font: inherit; font-size: 0.8rem; cursor: pointer; }
+.lf__select svg { position: absolute; right: 10px; pointer-events: none; color: #777; }
+.lf__input { padding: 0 0.8rem; gap: 0.6rem; }
+.lf__input input { flex: 1; border: 0; outline: 0; font: inherit; font-size: 0.85rem; background: transparent; }
+.lf__card textarea { padding: 0.7rem 0.8rem; border: 1px solid #ccc; border-radius: 6px; font: inherit; font-size: 0.75rem; resize: vertical; }
+.lf__card select:focus, .lf__card textarea:focus, .lf__input:focus-within { outline: 2px solid #2b9cf2; }
+
+.lf__err { margin: 0; padding: 0.5rem 0.9rem; background: #fee2e2; color: #b91c1c; border-radius: 8px; font-size: 0.8rem; }
+.lf__btns { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 1.2rem; }
+.lf__btns button, .lf__ok { height: 34px; min-width: 100px; padding: 0 1rem; border-radius: 6px; font: inherit; font-size: 0.85rem; cursor: pointer; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+.lf__cancel { background: #fff; border: 1px solid #bbb; }
+.lf__ok { background: #143f77; color: #fff; border: 0; }
+.lf__empty { place-items: center; text-align: center; color: #666; }
+
+/* ติดตามสถานะ */
+.lf__banner { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 1rem; border-radius: 6px; border: 1px solid; }
+.lf__banner > svg { font-size: 1.2rem; }
+.lf__banner b { display: block; font-size: 0.9rem; }
+.lf__banner small { font-size: 0.65rem; }
+.lf__banner.is-ok { background: #ecfdf3; border-color: #a7f3d0; color: #065f46; }
+.lf__banner.is-no { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+.lf__cols { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; }
+.lf__panel { padding: 1rem 1.1rem; background: #f8f9fb; border: 1px solid #e3e5ea; border-radius: 8px; min-height: 330px; }
+.lf__panel h3 { margin: 0 0 1rem; font-size: 0.95rem; }
+.lf__detail { background: #fff; display: flex; flex-direction: column; }
+.lf__detail dl { display: grid; grid-template-columns: 1fr auto; gap: 0.7rem 1rem; margin: 0; font-size: 0.68rem; }
+.lf__detail dt { color: #666; }
+.lf__detail dd { margin: 0; text-align: right; }
+.lf__btns--split { margin-top: auto; justify-content: stretch; }
+.lf__btns--split button { flex: 1; min-width: 0; font-size: 0.7rem; background: #fff; border: 1px solid #bbb; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; }
+.lf__btns--split .lf__del { color: #ef4444; border-color: #f4a3a3; }
+.lf__btns--split button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.4rem; }
+.tl li { position: relative; display: grid; grid-template-columns: 22px 1fr; column-gap: 0.7rem; font-size: 0.72rem; opacity: 0.55; }
+.tl li:not(:last-child)::after { content: ''; position: absolute; left: 10px; top: 24px; bottom: -1.3rem; width: 1px; background: #ccc; }
+.tl li i { grid-row: span 2; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #9ca3af; color: #fff; font-size: 0.75rem; }
+.tl li small { color: #777; font-size: 0.62rem; }
+.tl li.is-done, .tl li.is-wait, .tl li.is-no { opacity: 1; }
+.tl li.is-done i { background: #10b981; }
+.tl li.is-wait i { background: #fff; border: 2px solid #f59e0b; color: #f59e0b; }
+.tl li.is-no i { background: #ef4444; }
+
+@media (max-width: 800px) {
+  .lf__grid, .lf__cols { grid-template-columns: 1fr; }
+  .lf__select--half, .lf__input--half { width: 100%; }
+}

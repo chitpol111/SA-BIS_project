@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import { requireAuth } from './auth.js'
+import { requireAuth, requireRole } from './auth.js'
 
 const router = Router()
 
-router.get('/', requireAuth, (_req, res) => {
+router.get('/', ...requireRole('director'), (_req, res) => {
   res.json({
     stats: { total: 128, pending: 24, inProgress: 18, done: 86 },
     teamWork: [

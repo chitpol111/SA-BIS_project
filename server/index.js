@@ -9,6 +9,8 @@ import workRouter, { UPLOAD_DIR } from './work.js'
 import teamRouter from './team.js'
 import leaveRouter from './leave.js'
 import calendarRouter from './calendar.js'
+import myRouter from './my.js'
+import chatRouter from './chat.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = process.env.PORT || 3001
@@ -24,6 +26,8 @@ app.use('/api/work', workRouter)
 app.use('/api/teams', teamRouter)
 app.use('/api/leaves', leaveRouter)
 app.use('/api/calendar', calendarRouter)
+app.use('/api/my', myRouter)
+app.use('/api/chat', chatRouter)
 app.use('/uploads', express.static(UPLOAD_DIR))
 
 const dist = path.join(__dirname, '..', 'client', 'dist')

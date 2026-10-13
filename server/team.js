@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth } from './auth.js'
+import { requireAuth, requireRole } from './auth.js'
 
 const router = Router()
 const HEX = /^#[0-9a-fA-F]{6}$/
@@ -127,7 +127,7 @@ router.get('/:id', requireAuth, (req, res) => {
   res.json({ team: withCount(team), members: members.filter((m) => m.teamId === team.id) })
 })
 
-router.post('/', requireAuth, (req, res) => {
+router.post('/', ...requireRole('director'), (req, res) => {
   const { name, front, back } = req.body ?? {}
   let n = String(name ?? '').trim().slice(0, 40)
   if (!n) return res.status(400).json({ error: 'กรุณากรอกชื่อทีม' })

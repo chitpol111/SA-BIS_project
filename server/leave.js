@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { requireAuth } from './auth.js'
+import { requireAuth, requireRole } from './auth.js'
 import { members } from './team.js'
 
 const router = Router()
@@ -40,9 +40,10 @@ const RAW = [
   [33, 'ลาอุปสมบท',            '2026-11-10', '2027-02-08', 34, 'pending'],
   [2,  'ลาป่วย',              '2026-10-14', '2026-10-14', 3,  'pending'],
   [35, 'ลาพักร้อน',            '2026-10-19', '2026-10-23', 34, 'pending'],
+  [1,  'ลากิจส่วนตัว',         '2026-10-15', '2026-10-18', 3,  'approved'],
 ]
 
-const leaves = RAW.map(([memberId, type, start, end, substituteId, status], i) => ({
+export const leaves = RAW.map(([memberId, type, start, end, substituteId, status], i) => ({
   id: i + 1, memberId, type, start, end, substituteId, status,
 }))
 
@@ -83,13 +84,77 @@ function summary() {
 router.get('/', requireAuth, (_req, res) => res.json(leaves.map(view)))
 router.get('/summary', requireAuth, (_req, res) => res.json(summary()))
 
-router.patch('/:id', requireAuth, (req, res) => {
+router.patch('/:id', ...requireRole('director'), (req, res) => {
   const l = leaves.find((x) => x.id === Number(req.params.id))
   if (!l) return res.status(404).json({ error: 'ไม่พบรายการลา' })
   const { status } = req.body ?? {}
   if (!STATUSES.includes(status)) return res.status(400).json({ error: 'สถานะไม่ถูกต้อง' })
   l.status = status
   res.json(view(l))
+})
+
+// ---------- ส่วนของเจ้าหน้าที่ ----------
+const DURATIONS = ['full', 'half-am', 'half-pm', 'multi']
+const ISO = /^\d{4}-\d{2}-\d{2}$/
+const mineOf = (u) => leaves.filter((l) => u.memberId && l.memberId === u.memberId)
+const nextId = () => Math.max(0, ...leaves.map((l) => l.id)) + 1
+
+function validate(b, user) {
+  if (!TYPES.includes(b.type)) return 'ประเภทการลาไม่ถูกต้อง'
+  if (!DURATIONS.includes(b.duration)) return 'ระยะเวลาการลาไม่ถูกต้อง'
+  if (!ISO.test(b.start)) return 'วันที่ลาไม่ถูกต้อง'
+  if (b.duration === 'multi' && (!ISO.test(b.end) || b.end <= b.start)) return 'วันสิ้นสุดต้องหลังวันเริ่มต้น'
+  const me = byId(user.memberId)
+  const sub = byId(Number(b.substituteId))
+  if (!sub || sub.id === me?.id || sub.teamId !== me?.teamId) return 'กรุณาเลือกผู้แทนในทีมเดียวกัน'
+  return null
+}
+
+function fields(b) {
+  const end = b.duration === 'multi' ? b.end : b.start
+  return {
+    type: b.type, duration: b.duration, start: b.start, end,
+    substituteId: Number(b.substituteId),
+    note: String(b.note ?? '').slice(0, 1000),
+  }
+}
+
+router.get('/mine', requireAuth, (req, res) =>
+  res.json(mineOf(req.user).map(view).sort((a, b) => b.id - a.id))
+)
+
+router.get('/colleagues', requireAuth, (req, res) => {
+  const me = byId(req.user.memberId)
+  if (!me) return res.json([])
+  res.json(members.filter((m) => m.teamId === me.teamId && m.id !== me.id).map((m) => ({ id: m.id, name: m.name })))
+})
+
+router.post('/', requireAuth, (req, res) => {
+  if (!req.user.memberId) return res.status(403).json({ error: 'บัญชีนี้ไม่ได้ผูกกับบุคลากร' })
+  const b = req.body ?? {}
+  const err = validate(b, req.user)
+  if (err) return res.status(400).json({ error: err })
+  const leave = { id: nextId(), memberId: req.user.memberId, status: 'pending', createdAt: new Date().toISOString(), ...fields(b) }
+  leaves.push(leave)
+  res.status(201).json(view(leave))
+})
+
+router.put('/:id', requireAuth, (req, res) => {
+  const l = mineOf(req.user).find((x) => x.id === Number(req.params.id))
+  if (!l) return res.status(404).json({ error: 'ไม่พบใบลาของคุณ' })
+  if (l.status !== 'pending') return res.status(400).json({ error: 'แก้ไขได้เฉพาะใบลาที่รออนุมัติ' })
+  const err = validate(req.body ?? {}, req.user)
+  if (err) return res.status(400).json({ error: err })
+  Object.assign(l, fields(req.body))
+  res.json(view(l))
+})
+
+router.delete('/:id', requireAuth, (req, res) => {
+  const i = leaves.findIndex((x) => x.id === Number(req.params.id) && x.memberId === req.user.memberId)
+  if (i === -1) return res.status(404).json({ error: 'ไม่พบใบลาของคุณ' })
+  if (leaves[i].status !== 'pending') return res.status(400).json({ error: 'ยกเลิกได้เฉพาะใบลาที่รออนุมัติ' })
+  leaves.splice(i, 1)
+  res.json({ ok: true })
 })
 
 export { TYPES }
