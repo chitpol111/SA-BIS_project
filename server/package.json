@@ -2,7 +2,7 @@
   "name": "server",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=../.env.local index.js",
+    "dev": "node --watch --env-file-if-exists=../.env.local index.js",
     "start": "node index.js",
     "migrate-users": "node --env-file=../.env.local scripts/migrate-users.js",
     "add-user": "node --env-file=../.env.local scripts/add-user.js"

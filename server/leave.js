@@ -1,9 +1,21 @@
 import { Router } from 'express'
 import { requireAuth, requireRole } from './auth.js'
-import { registerCollection } from './db.js'
+import multer from 'multer'
+import { registerCollection, afterStateCommit } from './db.js'
+import { removeFile, signedFileUrl, uploadFile } from './storage.js'
 import { members } from './team.js'
 
 const router = Router()
+
+// ไฟล์เอกสารแนบใบลา (PDF/รูป ไม่เกิน 4MB ต่อไฟล์ แนบได้สูงสุด 3 ไฟล์)
+const DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
+const MAX_DOCS = 3
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 4 * 1024 * 1024, files: 1 },
+  fileFilter: (_r, f, cb) => (DOC_TYPES.includes(f.mimetype) ? cb(null, true) : cb(new Error('รองรับเฉพาะ PDF, JPG, PNG, WebP'))),
+})
+const docDir = (memberId) => `leave-docs/${memberId}/`
 const byId = (id) => members.find((m) => m.id === id)
 const overlap = (a, b) => a.start <= b.end && b.start <= a.end
 
@@ -108,6 +120,13 @@ function validate(b, user) {
   const me = byId(user.memberId)
   const sub = byId(Number(b.substituteId))
   if (!sub || sub.id === me?.id || sub.teamId !== me?.teamId) return 'กรุณาเลือกผู้แทนในทีมเดียวกัน'
+  if (b.attachments !== undefined) {
+    if (!Array.isArray(b.attachments) || b.attachments.length > MAX_DOCS) return `แนบเอกสารได้ไม่เกิน ${MAX_DOCS} ไฟล์`
+    const dir = docDir(user.memberId)
+    if (b.attachments.some((a) => typeof a?.path !== 'string' || !a.path.startsWith(dir) || a.path.includes('..'))) {
+      return 'ไฟล์แนบไม่ถูกต้อง'
+    }
+  }
   return null
 }
 
@@ -117,8 +136,71 @@ function fields(b) {
     type: b.type, duration: b.duration, start: b.start, end,
     substituteId: Number(b.substituteId),
     note: String(b.note ?? '').slice(0, 1000),
+    attachments: (Array.isArray(b.attachments) ? b.attachments : []).slice(0, MAX_DOCS).map((a) => ({
+      path: a.path,
+      name: String(a.name || 'เอกสาร').slice(0, 200),
+      size: Number(a.size) || 0,
+      type: String(a.type || '').slice(0, 60),
+      uploadedAt: a.uploadedAt && !Number.isNaN(Date.parse(a.uploadedAt)) ? new Date(a.uploadedAt).toISOString() : new Date().toISOString(),
+    })),
   }
 }
+
+// ---------- ไฟล์แนบ (ต้องอยู่ก่อนเส้นทาง /:id) ----------
+router.post('/attachment', requireAuth, (req, res) => {
+  if (!req.user.memberId) return res.status(403).json({ error: 'บัญชีนี้ไม่ได้ผูกกับบุคลากร' })
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      const msg = err.code === 'LIMIT_FILE_SIZE' ? 'ไฟล์ใหญ่เกิน 4MB' : err.message
+      return res.status(400).json({ error: msg })
+    }
+    if (!req.file) return res.status(400).json({ error: 'ไม่พบไฟล์' })
+    uploadFile(req.file, docDir(req.user.memberId).slice(0, -1))
+      .then((path) => res.status(201).json({
+        path,
+        name: Buffer.from(req.file.originalname, 'latin1').toString('utf8').slice(0, 200),
+        size: req.file.size,
+        type: req.file.mimetype,
+        uploadedAt: new Date().toISOString(),
+      }))
+      .catch((e) => {
+        console.error('Failed to store leave document:', e)
+        res.status(503).json({ error: 'บันทึกไฟล์ไม่สำเร็จ กรุณาลองใหม่ภายหลัง' })
+      })
+  })
+})
+
+// ลบไฟล์ที่เพิ่งอัปโหลดและยังไม่ผูกกับใบลาใด
+router.delete('/attachment', requireAuth, async (req, res) => {
+  const path = String(req.query.path ?? '')
+  if (!req.user.memberId || !path.startsWith(docDir(req.user.memberId)) || path.includes('..')) {
+    return res.status(403).json({ error: 'ไม่มีสิทธิ์ลบไฟล์นี้' })
+  }
+  if (leaves.some((l) => l.attachments?.some((a) => a.path === path))) {
+    return res.status(400).json({ error: 'ไฟล์นี้ถูกใช้กับใบลาอยู่' })
+  }
+  try {
+    await removeFile(path)
+    res.json({ ok: true })
+  } catch (e) {
+    console.error('Failed to remove leave document:', e)
+    res.status(503).json({ error: 'ลบไฟล์ไม่สำเร็จ' })
+  }
+})
+
+// ลิงก์เปิดไฟล์ (ชั่วคราว 1 ชม.) เจ้าของใบลาหรือผอ.เท่านั้น
+router.get('/attachment-url', requireAuth, async (req, res) => {
+  const path = String(req.query.path ?? '')
+  const ok = path.startsWith('leave-docs/') && !path.includes('..') &&
+    (req.user.role === 'director' || (req.user.memberId && path.startsWith(docDir(req.user.memberId))))
+  if (!ok) return res.status(403).json({ error: 'ไม่มีสิทธิ์เปิดไฟล์นี้' })
+  try {
+    res.json({ url: await signedFileUrl(path) })
+  } catch (e) {
+    console.error('Failed to sign leave document:', e)
+    res.status(503).json({ error: 'เปิดไฟล์ไม่สำเร็จ' })
+  }
+})
 
 router.get('/mine', requireAuth, (req, res) =>
   res.json(mineOf(req.user).map(view).sort((a, b) => b.id - a.id))
@@ -128,6 +210,21 @@ router.get('/colleagues', requireAuth, (req, res) => {
   const me = byId(req.user.memberId)
   if (!me) return res.json([])
   res.json(members.filter((m) => m.teamId === me.teamId && m.id !== me.id).map((m) => ({ id: m.id, name: m.name })))
+})
+
+// รายละเอียดใบลา (เฉพาะผอ.) ต้องอยู่หลัง /mine และ /colleagues
+router.get('/:id', ...requireRole('director'), (req, res) => {
+  const l = leaves.find((x) => x.id === Number(req.params.id))
+  if (!l) return res.status(404).json({ error: 'ไม่พบรายการลา' })
+  const m = byId(l.memberId)
+  res.json({
+    ...view(l),
+    duration: l.duration || (l.start === l.end ? 'full' : 'multi'),
+    note: l.note || '',
+    createdAt: l.createdAt || null,
+    attachments: l.attachments || [],
+    requester: { id: l.memberId, name: m?.name ?? '-', dept: m?.dept ?? '-', position: m?.position ?? '-' },
+  })
 })
 
 router.post('/', requireAuth, (req, res) => {
@@ -146,7 +243,11 @@ router.put('/:id', requireAuth, (req, res) => {
   if (l.status !== 'pending') return res.status(400).json({ error: 'แก้ไขได้เฉพาะใบลาที่รออนุมัติ' })
   const err = validate(req.body ?? {}, req.user)
   if (err) return res.status(400).json({ error: err })
+  const before = (l.attachments ?? []).map((a) => a.path)
   Object.assign(l, fields(req.body))
+  const kept = new Set(l.attachments.map((a) => a.path))
+  const dropped = before.filter((p) => !kept.has(p))
+  afterStateCommit(() => Promise.all(dropped.map((p) => removeFile(p).catch(console.error))))
   res.json(view(l))
 })
 
@@ -154,7 +255,9 @@ router.delete('/:id', requireAuth, (req, res) => {
   const i = leaves.findIndex((x) => x.id === Number(req.params.id) && x.memberId === req.user.memberId)
   if (i === -1) return res.status(404).json({ error: 'ไม่พบใบลาของคุณ' })
   if (leaves[i].status !== 'pending') return res.status(400).json({ error: 'ยกเลิกได้เฉพาะใบลาที่รออนุมัติ' })
-  leaves.splice(i, 1)
+  const [gone] = leaves.splice(i, 1)
+  const paths = (gone.attachments ?? []).map((a) => a.path)
+  afterStateCommit(() => Promise.all(paths.map((p) => removeFile(p).catch(console.error))))
   res.json({ ok: true })
 })
 

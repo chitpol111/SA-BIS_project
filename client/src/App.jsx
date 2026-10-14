@@ -10,6 +10,7 @@ import TeamAll from './pages/TeamAll'
 import TeamMember from './pages/TeamMember'
 import TeamLeave from './pages/TeamLeave'
 import TeamLeaveAccept from './pages/TeamLeaveAccept'
+import LeaveDetail from './pages/LeaveDetail'
 import Calendar from './pages/Calendar'
 import StaffHome from './pages/staff/StaffHome'
 import StaffWork from './pages/staff/StaffWork'
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/team/all" element={<ByRole director={<TeamAll />} staff={<StaffTeamAll />} />} />
           <Route path="/team/leave" element={<DirectorOnly><TeamLeave /></DirectorOnly>} />
           <Route path="/team/leave/accept" element={<DirectorOnly><TeamLeaveAccept /></DirectorOnly>} />
+          <Route path="/team/leave/detail/:id" element={<DirectorOnly><LeaveDetail /></DirectorOnly>} />
           <Route path="/team/leave/mine" element={<StaffLeaveStatus />} />
           <Route path="/team/leave/new" element={<StaffLeaveForm />} />
           <Route path="/team/:id" element={<ByRole director={<TeamMember />} staff={<StaffTeamMember />} />} />

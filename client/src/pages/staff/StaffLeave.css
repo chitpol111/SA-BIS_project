@@ -60,3 +60,19 @@
   .lf__grid, .lf__cols { grid-template-columns: 1fr; }
   .lf__select--half, .lf__input--half { width: 100%; }
 }
+
+/* เอกสารแนบ */
+.lf__docs { display: grid; gap: 0.3rem; }
+.lf__doclabel { font-size: 0.8rem; }
+.lf__docbox { display: grid; gap: 0.5rem; padding: 0.6rem; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+.lf__file { display: flex; align-items: center; gap: 0.7rem; }
+.lf__fileico { width: 32px; height: 32px; border-radius: 8px; background: #eceef1; display: grid; place-items: center; color: #666; flex: none; }
+.lf__fileinfo { flex: 1; min-width: 0; display: grid; }
+.lf__fileinfo strong { font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lf__fileinfo small { font-size: 0.65rem; color: #777; }
+.lf__file button { display: inline-flex; align-items: center; gap: 0.3rem; height: 28px; padding: 0 0.7rem; border: 1px solid #ccc; border-radius: 6px; background: #fff; font: inherit; font-size: 0.72rem; cursor: pointer; }
+.lf__file button:hover { background: #f3f4f6; }
+.lf__drop { display: flex; align-items: center; gap: 0.4rem; height: 34px; padding: 0 0.8rem; border: 1px dashed #b8bcc6; border-radius: 6px; background: #fafafb; color: #666; font: inherit; font-size: 0.75rem; cursor: pointer; }
+.lf__drop:hover, .lf__drop.is-drag { border-color: #2b9cf2; background: #f0f7ff; color: #143f77; }
+.lf__drop:disabled { opacity: 0.6; cursor: progress; }
+.lf__hint { font-size: 0.65rem; color: #777; }

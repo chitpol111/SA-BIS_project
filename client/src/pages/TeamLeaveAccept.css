@@ -37,3 +37,6 @@
   .la__row { min-width: 820px; }
   .la__search { width: 200px; }
 }
+
+.la__row--item.is-click { cursor: pointer; }
+.la__row--item.is-click:hover { background: #f3f7fc; border-color: #9fb6d0; }

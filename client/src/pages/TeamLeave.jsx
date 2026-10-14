@@ -78,7 +78,14 @@ export default function TeamLeave() {
                 <span>ลำดับ</span><span>ชื่อ</span><span>ประเภท</span><span>ระยะเวลา</span><span>สถานะ</span><span />
               </div>
               {leaves.map((l, i) => (
-                <div key={l.id} className="tl__row tl__row--item">
+                <div
+                  key={l.id}
+                  className="tl__row tl__row--item is-click"
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => !e.target.closest('.lva') && navigate(`/team/leave/detail/${l.id}`)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.target.closest('.lva') && navigate(`/team/leave/detail/${l.id}`)}
+                >
                   <span>{i + 1}</span>
                   <span>{l.name}</span>
                   <span><i className="tl__pill">{l.type}</i></span>

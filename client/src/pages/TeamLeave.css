@@ -55,3 +55,6 @@
   .tl__row { min-width: 620px; }
   .tl__plot { height: 260px; }
 }
+
+.tl__row--item.is-click { cursor: pointer; }
+.tl__row--item.is-click:hover { background: #f3f7fc; border-color: #9fb6d0; }

@@ -38,9 +38,12 @@ multiple work-update files share that limit.
 
 ### Run and test locally
 
-Use Node.js 20.19 or newer. The server's development command explicitly loads
-the repository-root `.env.local`. After setting that file and running the
-schema and account migration:
+Use Node.js 20.19 or newer. The server's development command loads the
+repository-root `.env.local` when present, so both development servers can
+start before configuration is complete. The API requires valid `SUPABASE_URL`,
+`SUPABASE_SERVICE_ROLE_KEY`, and `JWT_SECRET` values; without them, API requests
+will fail. After setting those values and running the schema and account
+migration:
 
 1. Run `npm run dev` from the repository root.
 2. Open `http://localhost:5173` and sign in with a migrated account. The API

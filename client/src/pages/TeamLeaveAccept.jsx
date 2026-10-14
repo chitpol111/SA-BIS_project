@@ -62,7 +62,14 @@ export default function TeamLeaveAccept() {
         </div>
         <div className="la__scroll">
           {rows.map((l, i) => (
-            <div key={l.id} className="la__row la__row--item">
+            <div
+                  key={l.id}
+                  className="la__row la__row--item is-click"
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => !e.target.closest('.lva') && navigate(`/team/leave/detail/${l.id}`)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.target.closest('.lva') && navigate(`/team/leave/detail/${l.id}`)}
+                >
               <span>{i + 1}</span>
               <span>{l.name}</span>
               <span><i className="la__pill">{l.type}</i></span>
