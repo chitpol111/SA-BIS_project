@@ -1,4 +1,6 @@
-# manpower-ma
+# SA-BIS_project
+
+## Manpower management app
 
 ## Supabase and Vercel
 
