@@ -17,11 +17,22 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20.19"
+  },
   "bugs": {
     "url": "https://github.com/phansiriphat-wi/manpower-ma/issues"
   },
   "homepage": "https://github.com/phansiriphat-wi/manpower-ma#readme",
   "devDependencies": {
     "concurrently": "^10.0.6"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0"
   }
 }

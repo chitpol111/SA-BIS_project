@@ -2,10 +2,13 @@
   "name": "server",
   "type": "module",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "node --watch --env-file=../.env.local index.js",
+    "start": "node index.js",
+    "migrate-users": "node --env-file=../.env.local scripts/migrate-users.js",
+    "add-user": "node --env-file=../.env.local scripts/add-user.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.3.0",

@@ -8,7 +8,7 @@ import { fmtDate } from '../../date'
 import { PROGRESS_LABEL } from '../../components/JobCard'
 import './StaffWorkDetail.css'
 
-const MAX = 5 * 1024 * 1024
+const MAX = 4 * 1024 * 1024
 const OK = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
 
 export default function StaffWorkDetail() {
@@ -41,16 +41,19 @@ export default function StaffWorkDetail() {
     const next = [...files]
     for (const f of Array.from(list)) {
       if (!OK.includes(f.type)) return setError('รองรับเฉพาะ JPG, PNG, WebP, PDF')
-      if (f.size > MAX) return setError(`ไฟล์ ${f.name} ใหญ่เกิน 5MB`)
+      if (f.size > MAX) return setError(`ไฟล์ ${f.name} ใหญ่เกิน 4MB`)
       next.push(f)
     }
     if (next.length > 5) return setError('แนบได้ครั้งละไม่เกิน 5 ไฟล์')
+    if (next.reduce((total, file) => total + file.size, 0) > MAX) {
+      return setError('ขนาดไฟล์รวมต้องไม่เกิน 4MB')
+    }
     setFiles(next)
     if (inputRef.current) inputRef.current.value = ''
   }
 
   async function removeSaved(u) {
-    const res = await fetch(`/api/my/jobs/${id}/updates/${u.url.split('/').pop()}`, {
+    const res = await fetch(`/api/my/jobs/${id}/updates/${encodeURIComponent(u.path.split('/').pop())}`, {
       method: 'DELETE', headers: authHeader(),
     })
     if (res.ok) setJob(await res.json())
@@ -101,9 +104,9 @@ export default function StaffWorkDetail() {
       <div className="swd__card">
         <div className="swd__left">
           <div className="swd__row swd__row--photo">
-            <label>รูปปัญหา</label>
+            <label>รูปปัญหาที่ต้องแก้ไข</label>
             {job.photo
-              ? <img src={job.photo} alt="รูปปัญหา" />
+              ? <img src={job.photo} alt={`รูปปัญหาที่ต้องแก้ไข: ${job.type}`} />
               : <div className="swd__nophoto">ไม่มีรูปประกอบ</div>}
           </div>
 
@@ -156,7 +159,7 @@ export default function StaffWorkDetail() {
             <button type="button" className="swd__upload" onClick={() => inputRef.current?.click()}>
               <FiUploadCloud /> upload files
             </button>
-            <small>หรือลากไฟล์มาวาง · JPG, PNG, WebP, PDF ไม่เกิน 5MB</small>
+            <small>หรือลากไฟล์มาวาง · JPG, PNG, WebP, PDF รวมไม่เกิน 4MB</small>
 
             <ul>
               {job.updates.map((u) => (

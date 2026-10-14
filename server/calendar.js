@@ -2,27 +2,25 @@ import { Router } from 'express'
 import { requireAuth } from './auth.js'
 import { works, staff } from './work.js'
 import { leaves } from './leave.js'
+import { registerCollection } from './db.js'
 
 const router = Router()
 const HEX = /^#[0-9a-fA-F]{6}$/
 const ISO = /^\d{4}-\d{2}-\d{2}$/
 const TYPE_COLOR = { 'ไฟฟ้า': '#143f77', 'โยธา': '#e2cc7a', 'คนสวน': '#10b981' }
 
-let eventId = 1
-let todoId = 6
+const customEvents = registerCollection('customEvents', [
+  { id: 1, owner: 1, title: 'ประชุมประจำเดือน', start: '2026-10-14', end: '2026-10-14', color: '#0b98e0', note: 'ห้องประชุมกองช่าง' },
+])
 
-const customEvents = [
-  { id: eventId++, owner: 1, title: 'ประชุมประจำเดือน', start: '2026-10-14', end: '2026-10-14', color: '#0b98e0', note: 'ห้องประชุมกองช่าง' },
-]
-
-const todos = [
+const todos = registerCollection('todos', [
   { id: 1, owner: 1, text: 'เซ็นเอกสารอนุมัติการลา', done: true },
   { id: 2, owner: 1, text: 'อนุมัติงบประมาณ', done: false },
   { id: 3, owner: 1, text: 'ติดตามสถานะงาน', done: false },
   { id: 4, owner: 1, text: 'ตรวจสอบอัตรากำลังเพื่อขอรับสมัครคนเพิ่ม', done: false },
   { id: 5, owner: 1, text: 'ติดตามผลการดำเนินงานที่ล่าช้า', done: true },
   { id: 6, owner: 1, text: 'มอบหมายงานใหม่', done: true },
-]
+])
 
 function visibleWorks(u) {
   if (u.role === 'director') return works
@@ -65,7 +63,8 @@ router.post('/events', requireAuth, (req, res) => {
   }
   if (!HEX.test(b.color)) return res.status(400).json({ error: 'สีไม่ถูกต้อง' })
   const ev = {
-    id: eventId++, owner: req.user.id, title, start: b.start, end: b.end, color: b.color,
+    id: Math.max(0, ...customEvents.map((event) => event.id)) + 1,
+    owner: req.user.id, title, start: b.start, end: b.end, color: b.color,
     note: String(b.note ?? '').slice(0, 500),
   }
   customEvents.push(ev)
@@ -86,7 +85,7 @@ router.get('/todos', requireAuth, (req, res) => res.json(mineTodo(req.user).map(
 router.post('/todos', requireAuth, (req, res) => {
   const text = String(req.body?.text ?? '').trim().slice(0, 150)
   if (!text) return res.status(400).json({ error: 'กรุณากรอกข้อความ' })
-  const t = { id: ++todoId, owner: req.user.id, text, done: false }
+  const t = { id: Math.max(0, ...todos.map((todo) => todo.id)) + 1, owner: req.user.id, text, done: false }
   todos.push(t)
   const { owner, ...out } = t
   res.status(201).json(out)

@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { requireAuth, requireRole } from './auth.js'
+import { registerCollection } from './db.js'
 
 const router = Router()
 const HEX = /^#[0-9a-fA-F]{6}$/
 
-export const teams = [
+export const teams = registerCollection('teams', [
   { id: 1, name: 'ทีมไฟฟ้า',      dept: 'ไฟฟ้า',      front: '#3d6ea6', back: '#143f77' },
   { id: 2, name: 'ทีมโยธา',       dept: 'โยธา',       front: '#d4af37', back: '#ffd60a' },
   { id: 3, name: 'ทีมเขียนแบบ',   dept: 'เขียนแบบ',   front: '#8b5cf6', back: '#595a7a' },
@@ -12,7 +13,7 @@ export const teams = [
   { id: 5, name: 'ทีมประปา',      dept: 'ประปา',      front: '#0ea5e9', back: '#b8cfe8' },
   { id: 6, name: 'ทีมสวนสาธารณะ', dept: 'สวนสาธารณะ', front: '#10b981', back: '#00ff00' },
   { id: 7, name: 'ทีมธุรการ',     dept: 'ธุรการ',     front: '#d9d9d9', back: '#64748b' },
-]
+])
 
 // คนแรกของแต่ละทีม = หัวหน้าทีม
 const ROSTER = {
@@ -65,7 +66,7 @@ const HISTORY = [
 ]
 const STARTS = ['2024-05-02', '2023-03-15', '2022-08-01', '2025-01-13', '2021-11-22']
 
-export const members = []
+export const members = registerCollection('members')
 let memberId = 0
 let jobId = 0
 

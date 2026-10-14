@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { FiImage, FiUploadCloud, FiTrash2, FiRefreshCw } from 'react-icons/fi'
 import './PhotoUpload.css'
 
-const MAX_MB = 5
+const MAX_MB = 4
 const OK_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 export default function PhotoUpload({ value, onUpload, onRemove }) {

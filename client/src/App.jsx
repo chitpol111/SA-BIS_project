@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import AppLayout from './layouts/AppLayout'
-import { getUser } from './auth'
+import { getUser, isAuthenticated } from './auth'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import Work from './pages/Work'
@@ -29,13 +29,17 @@ function DirectorOnly({ children }) {
   return getUser()?.role === 'director' ? children : <Navigate to="/" replace />
 }
 
+function RequireAuth({ children }) {
+  return isAuthenticated() ? children : <Navigate to="/login" replace />
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route element={<AppLayout />}>
+        <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
           <Route path="/" element={<ByRole director={<Home />} staff={<StaffHome />} />} />
           <Route path="/work" element={<ByRole director={<Work />} staff={<StaffWork />} />} />
           <Route path="/work/:id" element={<ByRole director={<WorkDetail />} staff={<StaffWorkDetail />} />} />

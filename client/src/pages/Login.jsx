@@ -25,6 +25,10 @@ export default function Login() {
       if (!res.ok) throw new Error(data.error || 'เข้าสู่ระบบไม่สำเร็จ')
 
       const store = remember ? localStorage : sessionStorage
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('user')
       store.setItem('token', data.token)
       store.setItem('user', JSON.stringify(data.user))
       navigate('/')

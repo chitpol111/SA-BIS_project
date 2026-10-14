@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FiChevronLeft, FiHome, FiCalendar, FiPlus, FiUser, FiX, FiMapPin, FiChevronDown } from 'react-icons/fi'
 import ConfirmModal from '../components/ConfirmModal'
-import PhotoUpload from '../components/PhotoUpload'
 import './WorkDetail.css'
 
-const TYPES = ['ไฟฟ้า', 'โยธา', 'คนสวน']
+const TYPES = ['ไฟฟ้า', 'โยธา', 'คนสวน', 'เขียนแบบ', 'สำรวจ', 'ประปา', 'ธุรการ', 'อื่นๆ']
 const TEAMS = ['ทีมไฟฟ้า', 'ทีมโยธา', 'ทีมคนสวน']
 const PRIORITIES = ['ด่วนมาก', 'ปกติ']
+const TYPE_PHOTOS = {
+  'ไฟฟ้า': '/work-default.png',
+  'โยธา': '/work-civil.png',
+  'คนสวน': '/work-garden.png',
+}
 
 function authHeader() {
   const t = localStorage.getItem('token') || sessionStorage.getItem('token')
@@ -53,20 +57,6 @@ export default function WorkDetail() {
 
   const mapUrl =
     'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(form.address || 'ประเทศไทย')
-
-  async function uploadPhoto(file) {
-    const fd = new FormData()
-    fd.append('photo', file)
-    const res = await fetch(`/api/work/${id}/photo`, { method: 'POST', headers: authHeader(), body: fd })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'อัปโหลดไม่สำเร็จ')
-    setForm((f) => ({ ...f, photo: data.photo }))
-  }
-
-  async function removePhoto() {
-    await fetch(`/api/work/${id}/photo`, { method: 'DELETE', headers: authHeader() })
-    setForm((f) => ({ ...f, photo: '' }))
-  }
 
   // กด "ยืนยัน" -> ตรวจข้อมูลแล้วเปิดป๊อปอัป
   function onSubmit(e) {
@@ -156,7 +146,7 @@ export default function WorkDetail() {
             </div>
           </div>
 
-          <PhotoUpload value={form.photo} onUpload={uploadPhoto} onRemove={removePhoto} />
+          <img className="wd__photo" src={TYPE_PHOTOS[form.type] || TYPE_PHOTOS['ไฟฟ้า']} alt={`รูปงาน${form.type}`} />
         </div>
 
         <div className="wd__officers">

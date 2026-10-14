@@ -1,5 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { displayName } from '../auth'
+import { NavLink, Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { getUser, displayName } from '../auth'
 import './AppLayout.css'
 
 const menu = [
@@ -10,6 +10,17 @@ const menu = [
 ]
 
 export default function AppLayout() {
+  const navigate = useNavigate()
+
+  // ยังไม่ล็อกอิน -> ไปหน้า login
+  if (!getUser()) return <Navigate to="/login" replace />
+
+  const logout = (e) => {
+    e.preventDefault()
+    try { localStorage.clear() } catch {}
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -30,7 +41,7 @@ export default function AppLayout() {
         </nav>
         <div className="sidebar__bottom">
           <NavLink to="/settings" className="sidebar__link">Setting</NavLink>
-          <NavLink to="/login" className="sidebar__link">Log out</NavLink>
+          <a href="/login" className="sidebar__link" onClick={logout}>Log out</a>
         </div>
       </aside>
 

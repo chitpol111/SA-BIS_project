@@ -1,24 +1,20 @@
 import { Router } from 'express'
 import multer from 'multer'
-import crypto from 'node:crypto'
 import { requireAuth } from './auth.js'
 import { members } from './team.js'
-import { UPLOAD_DIR } from './work.js'
+import { afterStateFailure, registerCollection, registerMap } from './db.js'
+import { removeFile, signedFileUrl, uploadFile } from './storage.js'
 
 const router = Router()
 const EXT = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'application/pdf': '.pdf' }
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: UPLOAD_DIR,
-    filename: (_r, f, cb) => cb(null, crypto.randomUUID() + EXT[f.mimetype]),
-  }),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 4 * 1024 * 1024, files: 1 },
   fileFilter: (_r, f, cb) => (EXT[f.mimetype] ? cb(null, true) : cb(new Error('รองรับเฉพาะ JPG, PNG, WebP, PDF'))),
 })
 
-const messages = [] // { id, from, to, text, file, createdAt }
-const notes = new Map() // `${me}:${other}` -> text
-let nextId = 1
+const messages = registerCollection('messages')
+const notes = registerMap('notes')
 
 // ตรวจว่าเป็นสมาชิกทีมเดียวกัน
 function peer(req, res) {
@@ -31,12 +27,17 @@ function peer(req, res) {
   return { me, other }
 }
 
-router.get('/:otherId', requireAuth, (req, res) => {
+router.get('/:otherId', requireAuth, async (req, res) => {
   const p = peer(req, res)
   if (!p) return
   const { me, other } = p
   res.json({
-    messages: messages.filter((m) => (m.from === me.id && m.to === other.id) || (m.from === other.id && m.to === me.id)),
+    messages: await Promise.all(messages
+      .filter((m) => (m.from === me.id && m.to === other.id) || (m.from === other.id && m.to === me.id))
+      .map(async (message) => ({
+        ...message,
+        file: message.file ? { ...message.file, url: await signedFileUrl(message.file.path) } : null,
+      }))),
     note: notes.get(`${me.id}:${other.id}`) ?? '',
   })
 })
@@ -46,20 +47,31 @@ router.post('/:otherId', requireAuth, (req, res) => {
   if (!p) return
   upload.single('file')(req, res, (err) => {
     if (err) {
-      return res.status(400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'ไฟล์ใหญ่เกิน 5MB' : err.message })
+      return res.status(400).json({ error: err.code === 'LIMIT_FILE_SIZE' ? 'ไฟล์ใหญ่เกิน 4MB' : err.message })
     }
     const text = String(req.body?.text ?? '').trim().slice(0, 2000)
     if (!text && !req.file) return res.status(400).json({ error: 'กรุณาพิมพ์ข้อความหรือแนบไฟล์' })
-    const msg = {
-      id: nextId++, from: p.me.id, to: p.other.id, text,
-      file: req.file
-        ? { url: '/uploads/' + req.file.filename, type: req.file.mimetype,
-            name: Buffer.from(req.file.originalname, 'latin1').toString('utf8') }
-        : null,
-      createdAt: new Date().toISOString(),
+    const save = async () => {
+      const path = req.file ? await uploadFile(req.file, 'chat-files') : null
+      const msg = {
+        id: Math.max(0, ...messages.map((message) => message.id)) + 1,
+        from: p.me.id, to: p.other.id, text,
+        file: req.file
+          ? { path, type: req.file.mimetype, name: Buffer.from(req.file.originalname, 'latin1').toString('utf8') }
+          : null,
+        createdAt: new Date().toISOString(),
+      }
+      messages.push(msg)
+      if (path) afterStateFailure(() => removeFile(path))
+      res.status(201).json({
+        ...msg,
+        file: msg.file ? { ...msg.file, url: await signedFileUrl(path) } : null,
+      })
     }
-    messages.push(msg)
-    res.status(201).json(msg)
+    save().catch((error) => {
+      console.error('Failed to store chat message:', error)
+      res.status(503).json({ error: 'ส่งข้อความไม่สำเร็จ กรุณาลองใหม่ภายหลัง' })
+    })
   })
 })
 

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { requireAuth, requireRole } from './auth.js'
+import { registerCollection } from './db.js'
 import { members } from './team.js'
 
 const router = Router()
@@ -43,9 +44,9 @@ const RAW = [
   [1,  'ลากิจส่วนตัว',         '2026-10-15', '2026-10-18', 3,  'approved'],
 ]
 
-export const leaves = RAW.map(([memberId, type, start, end, substituteId, status], i) => ({
+export const leaves = registerCollection('leaves', RAW.map(([memberId, type, start, end, substituteId, status], i) => ({
   id: i + 1, memberId, type, start, end, substituteId, status,
-}))
+})))
 
 const view = (l) => ({
   ...l,

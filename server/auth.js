@@ -1,33 +1,9 @@
 import { Router } from 'express'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import fs from 'node:fs'
-import path from 'node:path'
-import crypto from 'node:crypto'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DATA_DIR = path.join(__dirname, 'data')
-export const USERS_FILE = path.join(DATA_DIR, 'users.json')
+import { registerCollection } from './db.js'
 export const ROLES = ['director', 'staff']
-fs.mkdirSync(DATA_DIR, { recursive: true })
-
-// กุญแจเซ็น token: ใช้ JWT_SECRET ถ้ามี ไม่งั้นสร้างเองครั้งแรกแล้วเก็บไว้
-function getSecret() {
-  if (process.env.JWT_SECRET) return process.env.JWT_SECRET
-  const f = path.join(DATA_DIR, 'secret.txt')
-  if (!fs.existsSync(f)) fs.writeFileSync(f, crypto.randomBytes(48).toString('hex'), { mode: 0o600 })
-  return fs.readFileSync(f, 'utf8').trim()
-}
-const SECRET = getSecret()
-
-function loadUsers() {
-  try {
-    return JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'))
-  } catch {
-    return []
-  }
-}
+const users = registerCollection('users')
 const publicUser = (u) => ({ id: u.id, email: u.email, name: u.name, role: u.role, memberId: u.memberId ?? null })
 const DUMMY_HASH = bcrypt.hashSync('dummy-password', 10)
 
@@ -36,20 +12,28 @@ const router = Router()
 router.post('/login', (req, res) => {
   const email = String(req.body?.email ?? '').trim().toLowerCase()
   const password = String(req.body?.password ?? '')
-  const user = loadUsers().find((u) => u.email.toLowerCase() === email)
+  const secret = process.env.JWT_SECRET
+  if (!secret || Buffer.byteLength(secret) < 32) {
+    return res.status(503).json({ error: 'ระบบยืนยันตัวตนยังตั้งค่าไม่ครบ' })
+  }
+  const user = users.find((u) => u.email.toLowerCase() === email)
   const ok = bcrypt.compareSync(password, user?.passwordHash ?? DUMMY_HASH)
   if (!user || !ok) return res.status(401).json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' })
 
-  const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '8h' })
+  const token = jwt.sign({ id: user.id }, secret, { expiresIn: '8h' })
   res.json({ token, user: publicUser(user) })
 })
 
-// ตรวจ token และอ่าน role ล่าสุดจากไฟล์ผู้ใช้ทุกครั้ง (แก้ role แล้วมีผลทันที)
+// ตรวจ token และอ่าน role ล่าสุดจากฐานข้อมูลทุกครั้ง
 export function requireAuth(req, res, next) {
   const token = (req.headers.authorization || '').replace('Bearer ', '')
+  const secret = process.env.JWT_SECRET
+  if (!secret || Buffer.byteLength(secret) < 32) {
+    return res.status(503).json({ error: 'ระบบยืนยันตัวตนยังตั้งค่าไม่ครบ' })
+  }
   try {
-    const { id } = jwt.verify(token, SECRET)
-    const user = loadUsers().find((u) => u.id === id)
+    const { id } = jwt.verify(token, secret)
+    const user = users.find((u) => u.id === id)
     if (!user) throw new Error('no user')
     req.user = publicUser(user)
     next()

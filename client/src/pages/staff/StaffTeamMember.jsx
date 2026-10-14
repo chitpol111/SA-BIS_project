@@ -7,7 +7,7 @@ import { authHeader } from '../../api'
 import { getUser } from '../../auth'
 import './StaffTeamMember.css'
 
-const MAX = 5 * 1024 * 1024
+const MAX = 4 * 1024 * 1024
 const OK = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
 const timeOf = (iso) => new Date(iso).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' })
 
@@ -84,7 +84,7 @@ export default function StaffTeamMember() {
     setChatError('')
     if (!f) return
     if (!OK.includes(f.type)) return setChatError('รองรับเฉพาะ JPG, PNG, WebP, PDF')
-    if (f.size > MAX) return setChatError('ไฟล์ใหญ่เกิน 5MB')
+    if (f.size > MAX) return setChatError('ไฟล์ใหญ่เกิน 4MB')
     setFile(f)
   }
 
