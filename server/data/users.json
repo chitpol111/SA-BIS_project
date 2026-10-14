@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "John",
+    "role": "staff",
+    "memberId": 7,
+    "passwordHash": "$2b$10$VdHHt62Qw2snALcVOQvp.e99eUJR97I9LUlUBRmQlrCLcdn5H908S"
+  }
+]
