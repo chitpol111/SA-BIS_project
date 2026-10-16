@@ -106,6 +106,17 @@ for (const team of teams) {
   })
 }
 
+// ความพร้อมรับงาน: ภาระงานต่ำกว่า READY_BELOW % และไม่มีงานเกินกำหนด = "พร้อมรับงาน" นอกนั้น = "รับงานได้"
+const READY_BELOW = 30
+
+// ภาระงาน % = งานที่ยังไม่เสร็จ (กำลังดำเนินการ + เกินกำหนด) ÷ ความสามารถรับงาน (capacity งาน/เดือน)
+export function withLoad(m) {
+  const active = m.jobs.filter((j) => j.status !== 'done').length
+  const workload = Math.min(100, Math.round((active / (m.capacity || 20)) * 100))
+  const hasOverdue = m.jobs.some((j) => j.status === 'overdue')
+  return { ...m, workload, available: workload < READY_BELOW && !hasOverdue }
+}
+
 const withCount = (t) => ({ ...t, memberCount: members.filter((m) => m.teamId === t.id).length })
 
 router.get('/', requireAuth, (_req, res) => res.json(teams.map(withCount)))
@@ -114,7 +125,7 @@ router.get('/people', requireAuth, (_req, res) =>
   res.json(
     members.map((m) => ({
       id: m.id, teamId: m.teamId, name: m.name, dept: m.dept,
-      position: m.position, jobs: m.jobs.length, available: m.available,
+      position: m.position, jobs: m.jobs.length, available: withLoad(m).available,
     }))
   )
 )
@@ -125,7 +136,7 @@ router.get('/leave-summary', requireAuth, (_req, res) => res.json({ pending: 12 
 router.get('/:id', requireAuth, (req, res) => {
   const team = teams.find((t) => t.id === Number(req.params.id))
   if (!team) return res.status(404).json({ error: 'ไม่พบทีม' })
-  res.json({ team: withCount(team), members: members.filter((m) => m.teamId === team.id) })
+  res.json({ team: withCount(team), members: members.filter((m) => m.teamId === team.id).map((m) => withLoad(m)) })
 })
 
 router.post('/', ...requireRole('director'), (req, res) => {

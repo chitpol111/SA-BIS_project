@@ -107,6 +107,42 @@ router.delete('/:id/photo', ...requireRole('director'), (req, res) => {
   res.json({ photo: '' })
 })
 
+// ผอ.เพิ่มงานเอง (ไม่ต้องรับมาจากเรื่องร้องเรียน)
+router.post('/', ...requireRole('director'), (req, res) => {
+  const b = req.body ?? {}
+  if (!String(b.title ?? '').trim()) return res.status(400).json({ error: 'กรุณากรอกชื่องาน' })
+  if (!TYPES.includes(b.type)) return res.status(400).json({ error: 'ประเภทไม่ถูกต้อง' })
+  if (!PRIORITIES.includes(b.priority)) return res.status(400).json({ error: 'ความสำคัญไม่ถูกต้อง' })
+  if (!b.start || !b.end || b.end < b.start) {
+    return res.status(400).json({ error: 'ระยะเวลาไม่ถูกต้อง' })
+  }
+
+  const officers = (Array.isArray(b.officers) ? b.officers : [])
+    .map(Number)
+    .filter((id) => staff.some((s) => s.id === id))
+
+  const work = {
+    id: Math.max(0, ...works.map((x) => x.id)) + 1,
+    title: String(b.title).trim().slice(0, 200),
+    type: b.type,
+    description: String(b.description ?? '').slice(0, 2000),
+    address: String(b.address ?? '').slice(0, 500),
+    team: String(b.team || 'ทีม' + b.type).slice(0, 100),
+    start: b.start,
+    end: b.end,
+    officers,
+    priority: b.priority,
+    note: String(b.note ?? '').slice(0, 500),
+    photo: '',
+    status: officers.length > 0 ? 'มอบหมายแล้ว' : 'รอมอบหมาย',
+    progress: 'notstarted',
+    staffNote: '',
+    updates: [],
+  }
+  works.push(work)
+  res.status(201).json(work)
+})
+
 router.put('/:id', ...requireRole('director'), (req, res) => {
   const w = works.find((x) => x.id === Number(req.params.id))
   if (!w) return res.status(404).json({ error: 'ไม่พบงาน' })

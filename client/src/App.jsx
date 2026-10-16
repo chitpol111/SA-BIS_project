@@ -43,6 +43,7 @@ export default function App() {
         <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
           <Route path="/" element={<ByRole director={<Home />} staff={<StaffHome />} />} />
           <Route path="/work" element={<ByRole director={<Work />} staff={<StaffWork />} />} />
+          <Route path="/work/new" element={<DirectorOnly><WorkDetail /></DirectorOnly>} />
           <Route path="/work/:id" element={<ByRole director={<WorkDetail />} staff={<StaffWorkDetail />} />} />
           <Route path="/team" element={<ByRole director={<Team />} staff={<StaffTeam />} />} />
           <Route path="/team/all" element={<ByRole director={<TeamAll />} staff={<StaffTeamAll />} />} />

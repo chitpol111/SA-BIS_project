@@ -1,29 +1,61 @@
 import { Router } from 'express'
-import { requireAuth, requireRole } from './auth.js'
+import { requireRole } from './auth.js'
+import { works, staff } from './work.js'
 
 const router = Router()
 
+// ประเภทงาน -> ชื่อที่แสดงบนกราฟ (เรียงตามดีไซน์)
+const TEAM_ORDER = [
+  ['ไฟฟ้า', 'ไฟฟ้า'], ['โยธา', 'โยธา'], ['เขียนแบบ', 'เขียนแบบ'], ['สำรวจ', 'สำรวจ'],
+  ['ประปา', 'ประปา'], ['คนสวน', 'สวนสาธารณะ'], ['ธุรการ', 'ธุรการ'], ['อื่นๆ', 'อื่นๆ'],
+]
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const STATUS_TEXT = { notstarted: 'รอดำเนินการ', progress: 'กำลังดำเนินการ', done: 'เสร็จสมบูรณ์' }
+
+const fmt = (iso) => {
+  const [y, m, d] = iso.split('-').map(Number)
+  return `${d} ${MONTHS[m - 1]} ${y}`
+}
+
+export function buildDashboard(list, people, today) {
+  const count = (p) => list.filter((w) => w.progress === p).length
+
+  const teamWork = TEAM_ORDER
+    .map(([type, name]) => ({ name, value: list.filter((w) => w.type === type).length }))
+    .filter((t) => t.value > 0 || t.name !== 'อื่นๆ') // แสดง "อื่นๆ" เฉพาะเมื่อมีงาน
+
+  // จำนวนงานแต่ละเดือน (นับตามวันที่เริ่มงาน ของปีปัจจุบัน)
+  const year = today.slice(0, 4)
+  const monthly = Array.from({ length: 12 }, (_, i) => ({
+    month: i + 1,
+    value: list.filter((w) => w.start?.startsWith(`${year}-${String(i + 1).padStart(2, '0')}`)).length,
+  }))
+
+  // งานด่วน / เลยกำหนด: ยังไม่เสร็จ และ (ด่วนมาก หรือ เลยวันสิ้นสุดแล้ว)
+  const urgent = list
+    .filter((w) => w.progress !== 'done' && (w.priority === 'ด่วนมาก' || w.end < today))
+    .sort((a, b) => a.end.localeCompare(b.end) || a.id - b.id)
+    .slice(0, 5)
+    .map((w) => ({
+      id: w.id,
+      title: w.title,
+      team: w.type,
+      due: fmt(w.end),
+      owner: (w.officers ?? []).map((id) => people.find((s) => s.id === id)?.name).filter(Boolean).join(', ') || 'ยังไม่มอบหมาย',
+      status: STATUS_TEXT[w.progress] ?? STATUS_TEXT.notstarted,
+    }))
+
+  return {
+    stats: { total: list.length, pending: count('notstarted'), inProgress: count('progress'), done: count('done') },
+    teamWork,
+    monthly,
+    urgent,
+  }
+}
+
 router.get('/', ...requireRole('director'), (_req, res) => {
-  res.json({
-    stats: { total: 128, pending: 24, inProgress: 18, done: 86 },
-    teamWork: [
-      { name: 'ไฟฟ้า', value: 15 },
-      { name: 'โยธา', value: 9 },
-      { name: 'เขียนแบบ', value: 1 },
-      { name: 'สำรวจ', value: 14 },
-      { name: 'ประปา', value: 1.5 },
-      { name: 'สวนสาธารณะ', value: 5 },
-      { name: 'ธุรการ', value: 9 },
-    ],
-    monthly: [14, 8, 1, 3, 8, 5, 7.5, 8, 4, 18, 4, 17.5, 9].map((v, i) => ({ month: i, value: v })),
-    urgent: [
-      { id: 1, title: 'ซ่อมเสาไฟฟ้า', team: 'ไฟฟ้า', due: '10 Oct 2026', owner: 'นางสาวชานม ไข่มุก', status: 'รอดำเนินการ' },
-      { id: 2, title: 'ซ่อมเสาไฟฟ้า', team: 'ไฟฟ้า', due: '11 Oct 2026', owner: 'นายชาไทย วิปครีม', status: 'รอดำเนินการ' },
-      { id: 3, title: 'ซ่อมเสาไฟฟ้า', team: 'ไฟฟ้า', due: '12 Oct 2026', owner: 'นายโกโก้ คมเข้ม', status: 'รอดำเนินการ' },
-      { id: 4, title: 'ซ่อมเสาไฟฟ้า', team: 'ไฟฟ้า', due: '13 Oct 2026', owner: 'นางสาวมัตจะ ลาเต้', status: 'รอดำเนินการ' },
-      { id: 5, title: 'ซ่อมเสาไฟฟ้า', team: 'ไฟฟ้า', due: '13 Oct 2026', owner: 'นางสาวอเมริกาโน คาปูชิโน', status: 'รอดำเนินการ' },
-    ],
-  })
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' })
+  res.json(buildDashboard(works, staff, today))
 })
 
 export default router

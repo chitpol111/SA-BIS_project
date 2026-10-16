@@ -110,3 +110,6 @@
   .tmb__scroll { overflow-x: auto; }
   .tmb__row { min-width: 560px; }
 }
+
+.tmb__pill.is-can { background: #fdebc8; border-color: #f0c36d; color: #92600a; }
+.tmb__hint { display: block; margin-top: 0.5rem; font-size: 0.6rem; color: #777; text-align: center; }

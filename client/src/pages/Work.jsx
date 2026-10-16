@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FiSearch, FiCalendar, FiChevronRight, FiEdit2, FiChevronDown } from 'react-icons/fi'
+import { FiSearch, FiCalendar, FiChevronRight, FiEdit2, FiChevronDown, FiPlus } from 'react-icons/fi'
 import StatusBadge from '../components/StatusBadge'
 import './Work.css'
 
@@ -50,6 +50,7 @@ export default function Work() {
       <div className="work__tabs">
         <button className={tab === 'all' ? 'is-active' : ''} onClick={() => setTab('all')}>ทั้งหมด</button>
         <button className={tab === 'newest' ? 'is-active' : ''} onClick={() => setTab('newest')}>ใหม่-เก่า</button>
+        <button className="work__add" onClick={() => navigate('/work/new')}><FiPlus /> เพิ่มงาน</button>
       </div>
 
       {error && <p className="work__msg">{error}</p>}

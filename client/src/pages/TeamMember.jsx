@@ -69,7 +69,7 @@ export default function TeamMember() {
     ['กำลังดำเนินการ', count('progress')],
     ['เกินกำหนด', count('overdue')],
   ]
-  const color = m.workload > 85 ? '#ef4444' : '#22c55e'
+  const color = m.workload >= 85 ? '#ef4444' : m.available ? '#22c55e' : '#f59e0b'
   const c = m.contacts
 
   return (
@@ -188,10 +188,11 @@ export default function TeamMember() {
 
             <div className="tmb__ready">
               <span className="tmb__pill tmb__pill--sm">ความพร้อมรับงาน</span>
-              <span className={'tmb__pill tmb__pill--sm ' + (m.available ? 'is-free' : 'is-busy')}>
-                {m.available && <FiCheckCircle />} {m.available ? 'พร้อมปฏิบัติงาน' : 'ไม่ว่าง'}
+              <span className={'tmb__pill tmb__pill--sm ' + (m.available ? 'is-free' : 'is-can')}>
+                {m.available && <FiCheckCircle />} {m.available ? 'พร้อมรับงาน' : 'รับงานได้'}
               </span>
             </div>
+            <small className="tmb__hint">พร้อมรับงาน = ภาระงานต่ำกว่า 30% และไม่มีงานเกินกำหนด</small>
           </section>
         </aside>
       </div>

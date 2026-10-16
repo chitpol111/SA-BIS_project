@@ -57,3 +57,5 @@
   .people { overflow-x: auto; }
   .people__row { min-width: 720px; }
 }
+
+.state--can { background: #fdebc8; color: #92600a; border-color: #f0c36d; }

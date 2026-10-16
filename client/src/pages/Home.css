@@ -47,3 +47,5 @@
   .home__charts { grid-template-columns: 1fr; }
   .urgent__row { grid-template-columns: 1fr 1fr; }
 }
+
+.urgent__row .owner { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

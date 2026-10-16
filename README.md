@@ -28,7 +28,7 @@ Supabase Storage bucket. Before deploying:
    `npm run add-user --prefix server -- <email> <password> "<name>" <director|staff> [memberId]`.
 
 The first API request seeds versioned JSONB rows in Supabase with the
-repository's demo users, teams, members, jobs, leaves, calendar data, and chat
+repository's demo users, teas, members, jobs, leaves, calendar data, and chat
 state. Writes to separate collections can proceed independently; concurrent
 writes to the same collection are guarded against overwriting and return HTTP
 409 if the client needs to retry.

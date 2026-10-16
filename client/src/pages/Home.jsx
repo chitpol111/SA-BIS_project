@@ -52,7 +52,7 @@ export default function Home() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={teamWork} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} ticks={[0, 5, 10, 15, 20]} domain={[0, 20]} />
+                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
                 <Tooltip />
                 <Bar dataKey="value" barSize={42}>
                   {teamWork.map((_, i) => <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />)}
@@ -69,7 +69,7 @@ export default function Home() {
               <LineChart data={monthly} margin={{ top: 8, right: 12, left: -20, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke="#eee" />
                 <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} ticks={[0, 5, 10, 15, 20]} domain={[0, 20]} />
+                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
                 <Tooltip />
                 <Line type="linear" dataKey="value" stroke="#ec4899" strokeWidth={1}
                   dot={{ r: 2, fill: '#fff', stroke: '#ec4899' }} />

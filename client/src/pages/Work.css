@@ -57,3 +57,9 @@
   .work__row { min-width: 820px; }
   .work__search { width: 200px; }
 }
+
+.work__tabs .work__add {
+  margin-left: auto; width: auto; padding: 0 1rem; display: inline-flex; align-items: center; gap: 0.4rem;
+  background: #143f77; color: #fff; border-color: #143f77;
+}
+.work__tabs .work__add:hover { background: #1a4f9c; }

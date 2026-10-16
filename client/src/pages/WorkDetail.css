@@ -121,3 +121,5 @@
   .wd__footer { flex-wrap: wrap; }
   .wd__cancel, .wd__ok { width: 45%; margin-left: 0; }
 }
+
+.wd__grid--nophoto { grid-template-columns: 1fr; }

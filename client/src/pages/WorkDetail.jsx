@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FiChevronLeft, FiHome, FiCalendar, FiPlus, FiUser, FiX, FiMapPin, FiChevronDown } from 'react-icons/fi'
 import ConfirmModal from '../components/ConfirmModal'
+import { todayISO } from '../date'
 import './WorkDetail.css'
 
 const TYPES = ['ไฟฟ้า', 'โยธา', 'คนสวน', 'เขียนแบบ', 'สำรวจ', 'ประปา', 'ธุรการ', 'อื่นๆ']
-const TEAMS = ['ทีมไฟฟ้า', 'ทีมโยธา', 'ทีมคนสวน']
+const TEAMS = ['ทีมไฟฟ้า', 'ทีมโยธา', 'ทีมคนสวน', 'ทีมเขียนแบบ', 'ทีมสำรวจ', 'ทีมประปา', 'ทีมธุรการ']
 const PRIORITIES = ['ด่วนมาก', 'ปกติ']
 const TYPE_PHOTOS = {
   'ไฟฟ้า': '/work-default.png',
@@ -20,6 +21,7 @@ function authHeader() {
 
 export default function WorkDetail() {
   const { id } = useParams()
+  const isNew = !id // เส้นทาง /work/new
   const navigate = useNavigate()
   const [form, setForm] = useState(null)
   const [staff, setStaff] = useState([])
@@ -29,6 +31,19 @@ export default function WorkDetail() {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    if (isNew) {
+      fetch('/api/work/staff', { headers: authHeader() })
+        .then((s) => (s.ok ? s.json() : Promise.reject(new Error('โหลดรายชื่อเจ้าหน้าที่ไม่สำเร็จ'))))
+        .then((list) => {
+          setStaff(list)
+          setForm({
+            title: '', type: '', description: '', address: '', team: '',
+            start: '', end: '', officers: [], priority: '', note: '',
+          })
+        })
+        .catch((e) => setError(e.message))
+      return
+    }
     Promise.all([
       fetch(`/api/work/${id}`, { headers: authHeader() }),
       fetch('/api/work/staff', { headers: authHeader() }),
@@ -39,12 +54,12 @@ export default function WorkDetail() {
         setStaff(await s.json())
       })
       .catch((e) => setError(e.message))
-  }, [id])
+  }, [id, isNew])
 
   if (error && !form) return <p style={{ padding: '2rem' }}>{error}</p>
   if (!form) return <p style={{ padding: '2rem' }}>กำลังโหลด...</p>
 
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value }) // ไม่ตั้งค่าอัตโนมัติ
   const assigned = form.officers.map((oid) => staff.find((s) => s.id === oid)).filter(Boolean)
   const addable = staff.filter((s) => !form.officers.includes(s.id))
 
@@ -63,6 +78,7 @@ export default function WorkDetail() {
     e.preventDefault()
     setError('')
     if (!form.title.trim()) return setError('กรุณากรอกชื่องาน')
+    if (!form.type || !form.team || !form.priority) return setError('กรุณาเลือกประเภท ทีมที่รับผิดชอบ และความสำคัญ')
     if (form.end < form.start) return setError('วันสิ้นสุดต้องไม่ก่อนวันเริ่มต้น')
     setConfirm(true)
   }
@@ -71,8 +87,8 @@ export default function WorkDetail() {
   async function save() {
     setSaving(true)
     try {
-      const res = await fetch(`/api/work/${id}`, {
-        method: 'PUT',
+      const res = await fetch(isNew ? '/api/work' : `/api/work/${id}`, {
+        method: isNew ? 'POST' : 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeader() },
         body: JSON.stringify(form),
       })
@@ -91,20 +107,21 @@ export default function WorkDetail() {
     <div className="wd">
       <div className="wd__head">
         <button className="wd__back" onClick={() => navigate(-1)} aria-label="ย้อนกลับ"><FiChevronLeft /></button>
-        <h1>รายละเอียดงาน</h1>
+        <h1>{isNew ? 'เพิ่มงาน' : 'รายละเอียดงาน'}</h1>
         <button className="wd__home" onClick={() => navigate('/')} aria-label="หน้าแรก"><FiHome /></button>
       </div>
 
       <form className="wd__card" onSubmit={onSubmit}>
         <h2>มอบหมายงาน</h2>
 
-        <div className="wd__grid">
+        <div className={'wd__grid' + (isNew ? ' wd__grid--nophoto' : '')}>
           <div className="wd__fields">
             <div className="wd__line">
-              <label className="wd__label">ลำดับที่ {form.id}</label>
+              <label className="wd__label">ลำดับที่ {form.id ?? 'ใหม่'}</label>
               <input className="wd__input wd__input--title" value={form.title} onChange={set('title')} />
               <span className="wd__select wd__select--blue">
                 <select value={form.type} onChange={set('type')}>
+                  {!form.type && <option value="" disabled>เลือกประเภท</option>}
                   {TYPES.map((t) => <option key={t}>{t}</option>)}
                 </select>
                 <FiChevronDown />
@@ -129,6 +146,7 @@ export default function WorkDetail() {
               <label className="wd__label">ทีมที่รับผิดชอบ</label>
               <span className="wd__select wd__select--blue wd__select--wide">
                 <select value={form.team} onChange={set('team')}>
+                  {!form.team && <option value="" disabled>เลือกทีม</option>}
                   {TEAMS.map((t) => <option key={t}>{t}</option>)}
                 </select>
                 <FiChevronDown />
@@ -146,7 +164,9 @@ export default function WorkDetail() {
             </div>
           </div>
 
-          <img className="wd__photo" src={TYPE_PHOTOS[form.type] || TYPE_PHOTOS['ไฟฟ้า']} alt={`รูปงาน${form.type}`} />
+          {!isNew && (
+            <img className="wd__photo" src={TYPE_PHOTOS[form.type] || TYPE_PHOTOS['ไฟฟ้า']} alt={`รูปงาน${form.type}`} />
+          )}
         </div>
 
         <div className="wd__officers">
@@ -186,8 +206,9 @@ export default function WorkDetail() {
 
         <div className="wd__line wd__line--prio">
           <label className="wd__label">ความสำคัญ</label>
-          <span className={'wd__select wd__select--' + (form.priority === 'ด่วนมาก' ? 'red' : 'green')}>
+          <span className={'wd__select wd__select--' + (form.priority === 'ด่วนมาก' ? 'red' : form.priority ? 'green' : 'blue')}>
             <select value={form.priority} onChange={set('priority')}>
+              {!form.priority && <option value="" disabled>เลือกความสำคัญ</option>}
               {PRIORITIES.map((p) => <option key={p}>{p}</option>)}
             </select>
             <FiChevronDown />

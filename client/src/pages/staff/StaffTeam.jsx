@@ -56,8 +56,8 @@ export default function StaffTeam() {
             <span className="people__pos">{p.position}</span>
             <span><i className="jobs">{p.jobs} งาน</i></span>
             <span>
-              <i className={'state ' + (p.available ? 'state--free' : 'state--busy')}>
-                {p.available ? 'ว่าง' : 'ไม่ว่าง'}
+              <i className={'state ' + (p.available ? 'state--free' : 'state--can')}>
+                {p.available ? 'พร้อมรับงาน' : 'รับงานได้'}
               </i>
             </span>
           </div>
